@@ -26,5 +26,5 @@ public interface Constants {
      * Guice annotation for injecting topic name in custom
      * inbound transform implementation
      */
-    String TOPIC_NAME_GUICE_ANNOTATION = "topicName";
+    String TOPIC_NAME_GUICE_ANNOTATION = "com.aerospike.connect.inbound.Constants.TOPIC_NAME_GUICE_ANNOTATION";
 }
