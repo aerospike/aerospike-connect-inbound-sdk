@@ -24,9 +24,7 @@ import java.util.List;
 
 /**
  * Generate one or more [{@link AerospikeRecordOperation]}s from the com.aerospike.connect.inbound
- * record coming from some external system. TODO: Decide whether to allow
- * multiple operations on the same or different records. We can always say these
- * will not be transactional and will have no guarantees.
+ * record coming from some external system.
  *
  * @param <T>
  */
