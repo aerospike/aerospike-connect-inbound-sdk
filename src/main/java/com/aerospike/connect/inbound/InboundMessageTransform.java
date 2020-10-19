@@ -26,7 +26,17 @@ import java.util.List;
  * Generate one or more [{@link AerospikeRecordOperation]}s from the com.aerospike.connect.inbound
  * record coming from some external system.
  *
- * @param <T>
+ * <p>
+ * <ul>
+ *   <li> If you annotate your implementation with
+ *   <a href="https://docs.oracle.com/javaee/7/api/javax/inject/Singleton.html">@Singleton</a>,
+ *   it has to be thread safe because the same instance can be used by multiple threads.
+ *   </li>
+ *   <li> If not annotated with Singleton, then we will create a new instance of transform for every incoming message.
+ *   </li>
+ * </ul>
+ * </p>
+ * @param <T> incoming message type
  */
 public interface InboundMessageTransform<T> {
     /**
