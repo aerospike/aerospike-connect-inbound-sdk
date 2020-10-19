@@ -41,8 +41,11 @@ import java.util.List;
 public interface InboundMessageTransform<T> {
     /**
      * Transforms generic input message/record into a list of [{@link
-     * AerospikeRecordOperation} s to apply on to the Aerospike database. These
-     * will not be transactional.
+     * AerospikeRecordOperation} s to apply on to the Aerospike database.
+     *
+     * If multiple operations are returned, their execution is not guaranteed to be atomic. To perform multiple updates
+     * to the same record, it is recommended to use [{@link AerospikeOperateOperation}] which accepts list of
+     * [{@link com.aerospike.client.Operation}]s.
      */
     List<AerospikeRecordOperation> transform(T input);
 }
