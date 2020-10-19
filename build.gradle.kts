@@ -37,6 +37,7 @@ buildscript {
 plugins {
     `lifecycle-base`
     jacoco
+    `maven-publish`
 }
 
 allprojects {
@@ -168,49 +169,20 @@ allprojects {
         }
     }
 
-    val publishing = (project.extensions["publishing"] as PublishingExtension)
-
-    publishing.publications {
-
-        create<MavenPublication>("maven") {
-            from(components["java"])
-        }
-
-        publishing.repositories {
-            val repositoryUrl = uri(if (isSnapshotVersion(project
-                            .version)) {
-                "http://192.168.200.15:8080/repository/snapshots"
-            } else {
-                "http://192.168.200.15:8080/repository/internal"
-            })
-            val aerospikeRepoUser: String by project
-            val aerospikeRepoPassword: String by project
-
+    publishing {
+        repositories {
             maven {
-                name = "AerospikeMavenRepo"
-                url = repositoryUrl
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/aerospike/aerospike-connect-inbound-sdk")
                 credentials {
-                    username = aerospikeRepoUser
-                    password = aerospikeRepoPassword
+                    username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+                    password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
                 }
             }
         }
-
-        tasks.withType<PublishToMavenRepository>().configureEach {
-            onlyIf {
-                // Upload is snap shot version.
-                // If a proper release version upload only when release task is
-                // present. This prevents re-releasing re builds of released
-                // version. This is just sanity because our repository fails
-                // re-upload of a released artifact.
-                isSnapshotVersion(project.version) || hasReleaseTask()
-            }
-        }
-
-        // Bring latest snapshots.
-        configurations.all {
-            resolutionStrategy {
-                cacheChangingModulesFor(0, TimeUnit.SECONDS)
+        publications {
+            register<MavenPublication>("gpr") {
+                from(components["java"])
             }
         }
     }

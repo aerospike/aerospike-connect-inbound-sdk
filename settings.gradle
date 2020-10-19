@@ -16,5 +16,5 @@
  *  the License.
  */
 
-rootProject.name = 'aerospike-inbound-sdk'
+rootProject.name = 'aerospike-connect-inbound-sdk'
 

@@ -32,7 +32,7 @@ import java.util.List;
  *   <a href="https://docs.oracle.com/javaee/7/api/javax/inject/Singleton.html">@Singleton</a>,
  *   it has to be thread safe because the same instance can be used by multiple threads.
  *   </li>
- *   <li> If not annotated with Singleton, then we will create a new instance of transform for every incoming message.
+ *   <li> If not annotated with Singleton, then a new instance of transform will be created for every incoming message.
  *   </li>
  * </ul>
  * </p>
