@@ -18,8 +18,26 @@
 
 package com.aerospike.connect.inbound.operation;
 
+import com.aerospike.client.Key;
+import com.aerospike.client.policy.WritePolicy;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
- * An Aerospike record(s) operation.
+ * An Aerospike single record operation.
  */
-public interface AerospikeRecordOperation {
+public interface AerospikeSingleRecordOperation extends AerospikeRecordOperation {
+    /**
+     * The Aerospike record key.
+     */
+    @Nonnull
+    Key getKey();
+
+    /**
+     * The write policy to use for this operation. Defaults to null implying the
+     * default write policy.
+     */
+    @Nullable
+    WritePolicy getWritePolicy();
 }

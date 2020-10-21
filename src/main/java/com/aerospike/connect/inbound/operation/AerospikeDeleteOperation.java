@@ -33,7 +33,7 @@ import javax.annotation.Nullable;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Getter
-public class AerospikeDeleteOperation implements AerospikeRecordOperation {
+public class AerospikeDeleteOperation implements AerospikeSingleRecordOperation {
 
     /**
      * The Aerospike record key.

@@ -18,8 +18,26 @@
 
 package com.aerospike.connect.inbound.operation;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import java.util.List;
+
 /**
- * An Aerospike record(s) operation.
+ * A class to perform multiple [{@link AerospikeSingleRecordOperation}]s.
+ * <p>
+ * Execution of operations is not guaranteed to be consistent. To perform multiple updates
+ * to the same record, it is recommended to use [{@link AerospikeOperateOperation}] which accepts list of
+ * [{@link com.aerospike.client.Operation}]s.
+ * </p>
  */
-public interface AerospikeRecordOperation {
+@AllArgsConstructor
+@Getter
+public class AerospikeCompositeRecordOperation implements AerospikeRecordOperation {
+
+    /**
+     * List of [{@link AerospikeSingleRecordOperation}]
+     */
+    private final List<AerospikeSingleRecordOperation> operations;
+
 }

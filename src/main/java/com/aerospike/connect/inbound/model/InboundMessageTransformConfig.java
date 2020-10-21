@@ -19,13 +19,13 @@
 package com.aerospike.connect.inbound.model;
 
 import com.aerospike.connect.inbound.InboundMessageTransform;
+import com.aerospike.connect.inbound.operation.AerospikeCompositeRecordOperation;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;
 
@@ -38,19 +38,23 @@ import java.util.Map;
 @NoArgsConstructor
 public class InboundMessageTransformConfig {
     /**
-     * Class to be used for converting inbound messages to the [ {@link
+     * Class to be used for converting inbound messages to the [{@link
      * com.aerospike.connect.inbound.operation.AerospikeRecordOperation}].
      */
-    @Nonnull
     @JsonProperty("class")
-    private Class<? extends InboundMessageTransform<?>>
-            inboundMessageTransformClass;
+    private final Class<? extends InboundMessageTransform<?>>
+            inboundMessageTransformClass = null;
 
     /**
      * Custom parameters to be used by the custom transform.
      */
     @Nullable
     @JsonProperty("params")
-    private Map<String, Object> transformConfig;
+    private final Map<String, Object> transformConfig = null;
 
+    /**
+     * Whether to allow [{@link AerospikeCompositeRecordOperation}] or not.
+     */
+    @JsonProperty("unsafe-composite-record-operations")
+    private final boolean unsafeCompositeRecordOperation = false;
 }

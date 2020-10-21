@@ -20,10 +20,8 @@ package com.aerospike.connect.inbound;
 
 import com.aerospike.connect.inbound.operation.AerospikeRecordOperation;
 
-import java.util.List;
-
 /**
- * Generate one or more [{@link AerospikeRecordOperation]}s from the com.aerospike.connect.inbound
+ * Generate [{@link AerospikeRecordOperation]} from the com.aerospike.connect.inbound
  * record coming from some external system.
  *
  * <p>
@@ -40,12 +38,7 @@ import java.util.List;
  */
 public interface InboundMessageTransform<T> {
     /**
-     * Transforms generic input message/record into a list of [{@link
-     * AerospikeRecordOperation} s to apply on to the Aerospike database.
-     *
-     * If multiple operations are returned, their execution is not guaranteed to be atomic. To perform multiple updates
-     * to the same record, it is recommended to use [{@link AerospikeOperateOperation}] which accepts list of
-     * [{@link com.aerospike.client.Operation}]s.
+     * Transforms generic input message/record into [{@link AerospikeRecordOperation}] to apply on the Aerospike database.
      */
-    List<AerospikeRecordOperation> transform(T input);
+    AerospikeRecordOperation transform(T input);
 }

@@ -36,7 +36,7 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Getter
-public class AerospikeOperateOperation implements AerospikeRecordOperation {
+public class AerospikeOperateOperation implements AerospikeSingleRecordOperation {
 
     /**
      * The Aerospike record key.
