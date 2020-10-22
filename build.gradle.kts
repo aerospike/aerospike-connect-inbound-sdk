@@ -18,6 +18,7 @@
 
 import net.researchgate.release.ReleaseExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.net.URI
 
 val kotlinVersion = "1.4.0"
 
@@ -38,6 +39,8 @@ plugins {
     `lifecycle-base`
     jacoco
     `maven-publish`
+    signing
+    java
 }
 
 allprojects {
@@ -172,24 +175,66 @@ allprojects {
     publishing {
         repositories {
             maven {
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/aerospike/aerospike-connect-inbound-sdk")
+                val releaseRepo = URI("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+                val snapshotRepo = URI("https://oss.sonatype.org/content/repositories/snapshots/")
+                url = if (!isSnapshotVersion(project.version)) releaseRepo else snapshotRepo
                 credentials {
-                    username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
-                    password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+                    username = project.properties["ossrhUsername"] as String
+                    password = project.properties["ossrhPassword"] as String
                 }
             }
         }
+
         publications {
-            register<MavenPublication>("gpr") {
+            create<MavenPublication>("mavenJava") {
+                artifactId = project.name
                 from(components["java"])
+                versionMapping {
+                    usage("java-api") {
+                        fromResolutionOf("runtimeClasspath")
+                    }
+                    usage("java-runtime") {
+                        fromResolutionResult()
+                    }
+                }
+                pom {
+                    name.set("Aerospike Connect Inbound SDK")
+                    description.set("Inbound SDK for custom transforms or other plugins.")
+                    url.set("https://github.com/aerospike/aerospike-connect-inbound-sdk")
+                    licenses {
+                        license {
+                            name.set("The Apache License, Version 2.0")
+                            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                        }
+                    }
+                    scm {
+                        connection.set("scm:git@github.com:aerospike/aerospike-connect-inbound-sdk.git")
+                        url.set("htps://github.com/aerospike/aerospike-connect-inbound-sdk")
+                    }
+                }
+            }
+        }
+
+        tasks.withType<PublishToMavenRepository>().configureEach {
+            onlyIf {
+                // Upload if snap shot version.
+                // If a proper release version upload only when release task is
+                // present. This prevents re-releasing re builds of released
+                // version.
+                isSnapshotVersion(project.version) || hasReleaseTask()
             }
         }
     }
 
+    signing {
+        sign(publishing.publications.getByName("mavenJava"))
+    }
+
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
 }
-
-
 
 /**
  * Check if current project version is a snapshot version.
@@ -207,8 +252,8 @@ fun hasReleaseTask(): Boolean {
     gradle.taskGraph.allTasks.forEach {
         if (it.name == releaseTaskName) {
             hasRelease = true
+            return@forEach
         }
     }
-
     return hasRelease
 }

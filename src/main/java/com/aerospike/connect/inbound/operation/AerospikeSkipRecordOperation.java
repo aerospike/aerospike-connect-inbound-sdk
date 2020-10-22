@@ -18,26 +18,8 @@
 
 package com.aerospike.connect.inbound.operation;
 
-import com.aerospike.client.Key;
-import com.aerospike.client.policy.WritePolicy;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 /**
- * An Aerospike single record operation.
+ * The class to be used for cases when inbound record from the external system should be skipped.
  */
-public interface AerospikeSingleRecordOperation extends AerospikeRecordOperation {
-    /**
-     * @return Aerospike record Key
-     */
-    @Nonnull
-    Key getKey();
-
-    /**
-     * @return The write policy to use for this operation. Defaults to null implying the
-     * default write policy.
-     */
-    @Nullable
-    WritePolicy getWritePolicy();
+public class AerospikeSkipRecordOperation implements AerospikeRecordOperation {
 }

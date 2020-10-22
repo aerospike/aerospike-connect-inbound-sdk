@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 /**
@@ -33,8 +34,9 @@ import java.util.Map;
 @Getter
 public class InboundMessage<K, M> {
     /**
-     * Record key of the external system
+     * Record key of the external system can be null if there is no key for the message.
      */
+    @Nullable
     private final K key;
 
     /**

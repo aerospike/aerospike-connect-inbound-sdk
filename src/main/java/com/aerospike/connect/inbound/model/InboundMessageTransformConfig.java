@@ -24,7 +24,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -35,7 +34,6 @@ import java.util.Map;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Getter
-@NoArgsConstructor
 public class InboundMessageTransformConfig {
     /**
      * Class to be used for converting inbound messages to the [{@link
@@ -43,18 +41,27 @@ public class InboundMessageTransformConfig {
      */
     @JsonProperty("class")
     private final Class<? extends InboundMessageTransform<?>>
-            inboundMessageTransformClass = null;
+            inboundMessageTransformClass;
 
     /**
      * Custom parameters to be used by the custom transform.
      */
     @Nullable
     @JsonProperty("params")
-    private final Map<String, Object> transformConfig = null;
+    private final Map<String, Object> transformConfig;
 
     /**
      * Whether to allow [{@link AerospikeCompositeRecordOperation}] or not.
      */
     @JsonProperty("unsafe-composite-record-operations")
-    private final boolean unsafeCompositeRecordOperation = false;
+    private final boolean unsafeCompositeRecordOperation;
+
+    /**
+     * Private constructor for Jackson.
+     */
+    private InboundMessageTransformConfig() {
+        inboundMessageTransformClass = null;
+        transformConfig = null;
+        unsafeCompositeRecordOperation = false;
+    }
 }

@@ -21,10 +21,9 @@ package com.aerospike.connect.inbound;
 import com.aerospike.connect.inbound.operation.AerospikeRecordOperation;
 
 /**
- * Generate [{@link AerospikeRecordOperation]} from the com.aerospike.connect.inbound
+ * Generate [{@link AerospikeRecordOperation}] from the com.aerospike.connect.inbound
  * record coming from some external system.
  *
- * <p>
  * <ul>
  *   <li> If you annotate your implementation with
  *   <a href="https://docs.oracle.com/javaee/7/api/javax/inject/Singleton.html">@Singleton</a>,
@@ -33,12 +32,15 @@ import com.aerospike.connect.inbound.operation.AerospikeRecordOperation;
  *   <li> If not annotated with Singleton, then a new instance of transform will be created for every incoming message.
  *   </li>
  * </ul>
- * </p>
+ *
  * @param <T> incoming message type
  */
 public interface InboundMessageTransform<T> {
     /**
      * Transforms generic input message/record into [{@link AerospikeRecordOperation}] to apply on the Aerospike database.
+     *
+     * @param input Inbound message from the external system.
+     * @return the operation to apply.
      */
     AerospikeRecordOperation transform(T input);
 }
