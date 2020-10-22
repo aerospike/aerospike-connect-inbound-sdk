@@ -16,8 +16,6 @@
  *  the License.
  */
 
-package com.aerospike.connect.inbound.kafka;
-
 import com.aerospike.client.AerospikeException;
 import com.aerospike.client.Bin;
 import com.aerospike.client.Key;
@@ -25,11 +23,15 @@ import com.aerospike.client.Operation;
 import com.aerospike.client.Record;
 import com.aerospike.client.Value;
 import com.aerospike.client.cdt.ListOperation;
+import com.aerospike.connect.inbound.AerospikeReader;
+import com.aerospike.connect.inbound.Constants;
+import com.aerospike.connect.inbound.InboundMessageTransform;
 import com.aerospike.connect.inbound.model.InboundMessage;
 import com.aerospike.connect.inbound.model.InboundMessageTransformConfig;
 import com.aerospike.connect.inbound.operation.AerospikeOperateOperation;
 import com.aerospike.connect.inbound.operation.AerospikePutOperation;
 import com.aerospike.connect.inbound.operation.AerospikeRecordOperation;
+import com.aerospike.connect.inbound.operation.AerospikeSkipRecordOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,15 +43,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.emptyList;
-
 /**
  * An example custom transforms that appends incoming CDR (Call Detail Record)
  * to existing record in case it exists. If the list becomes too large it
  * is trimmed.
  */
 public class CasCDTCustomTransform implements
-InboundMessageTransform<InboundMessage<Object, Object>> {
+        InboundMessageTransform<InboundMessage<Object, Object>> {
 
     private static final Logger logger = LoggerFactory.getLogger("logger");
 
@@ -77,7 +77,7 @@ InboundMessageTransform<InboundMessage<Object, Object>> {
     }
 
     @Override
-    public List<AerospikeRecordOperation> transform(
+    public AerospikeRecordOperation transform(
             InboundMessage<Object, Object> inboundMessage) {
 
         Map<String, Object> input = inboundMessage.getFields();
@@ -87,7 +87,7 @@ InboundMessageTransform<InboundMessage<Object, Object>> {
 
         if (key == null) {
             logger.error("invalid message " + input);
-            return emptyList();
+            return new AerospikeSkipRecordOperation();
         }
 
         String newCdr = "cdr_" + System.currentTimeMillis();
@@ -104,7 +104,6 @@ InboundMessageTransform<InboundMessage<Object, Object>> {
             // the key in Aerospike
             logger.error("Error while getting the record", ae);
         }
-        List<AerospikeRecordOperation> recordOperations = new ArrayList<>();
 
         if (existingRecord == null) {
             List<Bin> bins = new ArrayList<>();
@@ -119,23 +118,22 @@ InboundMessageTransform<InboundMessage<Object, Object>> {
                     .entrySet()
                     .stream()
                     .map(e -> new Bin(e.getKey(), e.getValue()))
-            .collect(Collectors.toList())
+                    .collect(Collectors.toList())
             );
             // Add all kafka message fields as a Bin
             bins.addAll(input
                     .entrySet()
                     .stream()
                     .map(e -> new Bin(e.getKey(), e.getValue()))
-            .collect(Collectors.toList())
+                    .collect(Collectors.toList())
             );
-            recordOperations.add(new AerospikePutOperation(aerospikeKey, null, bins));
+            return new AerospikePutOperation(aerospikeKey, null, bins);
         } else {
             // List of Aerospike operations.
             List<Operation> operations = new ArrayList<>();
 
             // Append the CDR if the list is small, else first truncate the
             // list.
-            @SuppressWarnings("unchecked")
             List<String> existingCdrs = (List<String>) existingRecord.bins.get("cdrs");
 
             int cdrMaxCapacity = 2;
@@ -146,8 +144,7 @@ InboundMessageTransform<InboundMessage<Object, Object>> {
             // Insert new CDR to the top of the list.
             operations.add(ListOperation.insert("cdrs", 0, Value.get(newCdr)));
 
-            recordOperations.add(new AerospikeOperateOperation(aerospikeKey, null, operations));
+            return new AerospikeOperateOperation(aerospikeKey, null, operations);
         }
-        return recordOperations;
     }
 }
