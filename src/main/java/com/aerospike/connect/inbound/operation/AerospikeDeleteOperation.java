@@ -46,7 +46,6 @@ public class AerospikeDeleteOperation implements AerospikeSingleRecordOperation 
      * default write policy.
      */
     @Nullable
-    @EqualsAndHashCode.Exclude
     private final WritePolicy writePolicy;
 
 }
