@@ -77,7 +77,7 @@ allprojects {
 
     // Common dependency versions.
     extra["kotlinVersion"] = kotlinVersion
-    extra["aerospikeClientVersion"] = "4.4.18"
+    extra["aerospikeClientVersion"] = "5.0.0"
     extra["jacksonVersion"] = "2.11.+"
 
     dependencies {

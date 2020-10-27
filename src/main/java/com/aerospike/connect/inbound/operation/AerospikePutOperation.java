@@ -48,7 +48,6 @@ public class AerospikePutOperation implements AerospikeSingleRecordOperation {
      * default write policy.
      */
     @Nullable
-    @EqualsAndHashCode.Exclude
     private final WritePolicy writePolicy;
 
     /**
