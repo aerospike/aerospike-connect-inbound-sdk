@@ -17,7 +17,7 @@ Add a dependency to com.aerospike:aerospike-connect-inbound-sdk.
 </dependency>
 ```
 
-See this example [pom.xml](examples/kafka-maven/pom.xml).
+See this example [pom.xml](examples/kafka/pom.xml).
 
 ### Gradle
 
@@ -28,7 +28,6 @@ dependencies {
     api("com.aerospike:aerospike-connect-inbound-sdk:0.9.0-SNAPSHOT")
 }
 ```
-See this example [build.gradle.kts](examples/kafka-gradle/build.gradle.kts).
 
 #### Groovy
 
