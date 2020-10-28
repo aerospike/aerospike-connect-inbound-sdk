@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -48,10 +49,11 @@ import java.util.stream.Collectors;
  * to existing record in case it exists. If the list becomes too large it
  * is trimmed.
  */
+@Singleton
 public class CasCDTCustomTransform implements
         InboundMessageTransform<InboundMessage<Object, Object>> {
 
-    private static final Logger logger = LoggerFactory.getLogger("logger");
+    private static final Logger logger = LoggerFactory.getLogger(CasCDTCustomTransform.class.getName());
 
     /**
      * Injected aerospike reader to read records from Aerospike.

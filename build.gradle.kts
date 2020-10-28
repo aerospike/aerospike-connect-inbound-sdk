@@ -65,12 +65,6 @@ allprojects {
         mavenLocal()
         mavenCentral()
         jcenter()
-        maven {
-            url = uri("http://192.168.200.15:8080/repository/snapshots")
-        }
-        maven {
-            url = uri("http://192.168.200.15:8080/repository/internal")
-        }
     }
 
     group = "com.aerospike"

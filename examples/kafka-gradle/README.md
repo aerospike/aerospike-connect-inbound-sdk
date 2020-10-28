@@ -1,0 +1,1 @@
+Kafka Inbound custom transform example using `gradle`.
