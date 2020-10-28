@@ -206,6 +206,14 @@ allprojects {
                         developerConnection.set("scm:git@github.com:aerospike/aerospike-connect-inbound-sdk.git")
                         url.set("htps://github.com/aerospike/aerospike-connect-inbound-sdk")
                     }
+                    developers{
+                        developer {
+                            name.set("Aerospike")
+                            email.set("developers@aerospike.com")
+                            organization.set("Aerospike")
+                            url.set("https://www.aerospike.com/")
+                        }
+                    }
                 }
             }
         }
