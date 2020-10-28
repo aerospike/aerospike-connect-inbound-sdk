@@ -203,6 +203,7 @@ allprojects {
                     }
                     scm {
                         connection.set("scm:git@github.com:aerospike/aerospike-connect-inbound-sdk.git")
+                        developerConnection.set("scm:git@github.com:aerospike/aerospike-connect-inbound-sdk.git")
                         url.set("htps://github.com/aerospike/aerospike-connect-inbound-sdk")
                     }
                 }
