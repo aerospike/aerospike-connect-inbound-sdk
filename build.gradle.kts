@@ -17,10 +17,7 @@
  */
 
 import net.researchgate.release.ReleaseExtension
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.net.URI
-
-val kotlinVersion = "1.4.0"
 
 buildscript {
     repositories {
@@ -30,7 +27,6 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.0")
         classpath("net.researchgate:gradle-release:2.6.0")
     }
 }
@@ -55,7 +51,6 @@ allprojects {
     apply {
         plugin(JavaPlugin::class.java)
         plugin("java-library")
-        plugin("org.jetbrains.kotlin.jvm")
         plugin("jacoco")
         plugin("maven-publish")
         plugin("net.researchgate.release")
@@ -70,12 +65,11 @@ allprojects {
     group = "com.aerospike"
 
     // Common dependency versions.
-    extra["kotlinVersion"] = kotlinVersion
     extra["aerospikeClientVersion"] = "5.0.0"
     extra["jacksonVersion"] = "2.11.+"
 
     dependencies {
-        // Lombok for its @Generated annotaiton that jacoco ignores
+        // Lombok for its @Generated annotation that jacoco ignores
         "compileOnly"("org.projectlombok:lombok:1.18.12")
         "annotationProcessor"("org.projectlombok:lombok:1.18.12")
 
@@ -96,18 +90,6 @@ allprojects {
                 "org.junit.jupiter:junit-jupiter-params:5.4.2"
         )
         "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.4.2")
-    }
-
-    /**
-     * Ensure code is compiled for java 8 target.
-     */
-    val compileKotlin: KotlinCompile by tasks
-    compileKotlin.kotlinOptions {
-        jvmTarget = "1.8"
-    }
-    val compileTestKotlin: KotlinCompile by tasks
-    compileTestKotlin.kotlinOptions {
-        jvmTarget = "1.8"
     }
 
     val compileJava: JavaCompile by tasks

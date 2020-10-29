@@ -31,7 +31,7 @@
         <dependency>
             <groupId>com.aerospike</groupId>
             <artifactId>aerospike-connect-inbound-sdk</artifactId>
-            <version>0.9.7</version>
+            <version>0.9.8</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
