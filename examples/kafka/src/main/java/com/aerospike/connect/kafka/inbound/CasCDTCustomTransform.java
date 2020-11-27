@@ -60,10 +60,6 @@ public class CasCDTCustomTransform implements
      */
     private final AerospikeReader aerospikeReader;
     /**
-     * Topic name of the current record
-     */
-    private final String topicName;
-    /**
      * Inbound message transform config for the topic against which this class
      * is bound
      */
@@ -71,10 +67,8 @@ public class CasCDTCustomTransform implements
 
     @Inject
     public CasCDTCustomTransform(AerospikeReader aerospikeReader,
-                                 @Named(Constants.TOPIC_NAME_GUICE_ANNOTATION) String topicName,
                                  InboundMessageTransformConfig inboundMessageTransformConfig) {
         this.aerospikeReader = aerospikeReader;
-        this.topicName = topicName;
         this.inboundMessageTransformConfig = inboundMessageTransformConfig;
     }
 
@@ -114,7 +108,7 @@ public class CasCDTCustomTransform implements
             cdrList.add(newCdr);
             bins.add(new Bin("cdrs", cdrList));
 
-            bins.add(new Bin("topicName", topicName));
+            bins.add(new Bin("topicName", inboundMessageTransformConfig.getTransformConfig().get("topicName")));
             // Add all config fields as a Bin
             bins.addAll(Objects.requireNonNull(inboundMessageTransformConfig.getTransformConfig())
                     .entrySet()
