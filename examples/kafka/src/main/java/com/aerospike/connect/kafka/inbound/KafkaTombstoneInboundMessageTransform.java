@@ -38,6 +38,7 @@ public final class KafkaTombstoneInboundMessageTransform
     @Override
     public AerospikeRecordOperation transform(
             InboundMessage<Object, SinkRecord> inboundMessage) {
+        // Kafka tombstone record has non-null key and null payload
         if (inboundMessage.getMessage().value() == null) {
             return new AerospikeDeleteOperation(
                     new Key("test", null, "jumbo_jet"), null);
