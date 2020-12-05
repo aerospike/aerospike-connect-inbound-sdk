@@ -27,8 +27,11 @@ import com.aerospike.connect.inbound.operation.AerospikePutOperation;
 import com.aerospike.connect.inbound.operation.AerospikeRecordOperation;
 import org.apache.kafka.connect.sink.SinkRecord;
 
-import static kotlin.collections.CollectionsKt.listOf;
+import static java.util.Collections.singletonList;
 
+/**
+ * Custom inbound transform example with kafka tombstone record.
+ */
 public final class KafkaTombstoneInboundMessageTransform
         implements InboundMessageTransform<InboundMessage<Object, SinkRecord>> {
 
@@ -40,7 +43,7 @@ public final class KafkaTombstoneInboundMessageTransform
                     new Key("test", null, "jumbo_jet"), null);
         }
         return new AerospikePutOperation(new Key("test", null, "kevin"), null,
-                listOf(new Bin("name",
+                singletonList(new Bin("name",
                         inboundMessage.getFields().get("name"))));
     }
 }
