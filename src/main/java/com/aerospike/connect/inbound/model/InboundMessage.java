@@ -49,11 +49,13 @@ public class InboundMessage<K, M> {
     /**
      * Aerospike record key parsed/generated from the inbound config.
      */
+    @Nullable
     private final Key aerospikeKey;
 
     /**
      * WritePolicy which can be used by the writeOperation. You can use your own policy as well.
      */
+    @Nullable
     private final WritePolicy writePolicy;
 
     /**
