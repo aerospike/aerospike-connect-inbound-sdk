@@ -18,6 +18,8 @@
 
 package com.aerospike.connect.inbound.model;
 
+import com.aerospike.client.Key;
+import com.aerospike.client.policy.WritePolicy;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -43,6 +45,18 @@ public class InboundMessage<K, M> {
      * Un-parsed raw message from the external system.
      */
     private final M message;
+
+    /**
+     * Aerospike record key parsed/generated from the inbound config.
+     */
+    @Nullable
+    private final Key aerospikeKey;
+
+    /**
+     * WritePolicy which can be used by the writeOperation. You can use your own policy as well.
+     */
+    @Nullable
+    private final WritePolicy writePolicy;
 
     /**
      * Mapping of the field name to it's value of the message coming from the
