@@ -26,41 +26,71 @@ import lombok.Getter;
 
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.Optional;
 
 /**
- * Incoming message from the external system like Kafka, Pulsar via Aerospike
- * com.aerospike.connect.inbound connector
+ * A message from an external system like Kafka, Pulsar, etc processed by a
+ * Aerospike inbound connector.
+ *
+ * The message is processed by the Aerospike inbound connector as specified in
+ * its config and converted to a InboundMessage.
  */
 @AllArgsConstructor
 @EqualsAndHashCode
 @Getter
 public class InboundMessage<K, M> {
     /**
-     * Record key of the external system can be null if there is no key for the message.
+     * The key of the message. Is present only if the external system associates
+     * a key with the message.
+     * <p>
+     * For example in Kafka it will be the value returned by
+     * org.apache.kafka.connect.connector.SinkRecord#key method.
+     * </p>
      */
     @Nullable
-    private final K key;
+    private final K messageKey;
 
     /**
-     * Un-parsed raw message from the external system.
+     * The un-parsed raw message from the external system.
+     * <p>
+     * For example in Kafka it will be an instance of
+     * org.apache.kafka.connect.sink.SinkRecord.
+     * </p>
      */
     private final M message;
 
     /**
-     * Aerospike record key parsed/generated from the inbound config.
+     * Aerospike record key extracted from the message by the Aerospike inbound
+     * connector. It will be present only if the Aerospike inbound connector
+     * config specifies extracting an Aerospike key from the incoming message.
      */
     @Nullable
-    private final Key aerospikeKey;
+    private final Key key;
 
     /**
-     * WritePolicy which can be used by the writeOperation. You can use your own policy as well.
+     * Aerospike write policy generated from the message by the Aerospike
+     * inbound connector. It will be present only if the Aerospike inbound
+     * connector config specifies extracting {@link WritePolicy} attributes
+     * from the incoming message.
      */
     @Nullable
     private final WritePolicy writePolicy;
 
     /**
-     * Mapping of the field name to it's value of the message coming from the
-     * external system.
+     * Fields extracted from the message as per the bins config specified
+     * for the Aerospike inbound connector.
      */
     private final Map<String, Object> fields;
+
+    public Optional<K> getMessageKey() {
+        return Optional.ofNullable(messageKey);
+    }
+
+    public Optional<Key> getKey() {
+        return Optional.ofNullable(key);
+    }
+
+    public Optional<WritePolicy> getWritePolicy() {
+        return Optional.ofNullable(writePolicy);
+    }
 }
