@@ -24,11 +24,11 @@ import lombok.Getter;
 import java.util.List;
 
 /**
- * A class to perform multiple [{@link AerospikeSingleRecordOperation}]s.
+ * A class to perform multiple {@link AerospikeSingleRecordOperation}s.
  * <p>
  * Execution of operations is not guaranteed to be consistent. To perform multiple updates
- * to the same record, it is recommended to use [{@link AerospikeOperateOperation}] which accepts list of
- * [{@link com.aerospike.client.Operation}]s.
+ * to the same record, it is recommended to use {@link AerospikeOperateOperation} which accepts list of
+ * {@link com.aerospike.client.Operation}s.
  * </p>
  */
 @AllArgsConstructor
@@ -36,7 +36,7 @@ import java.util.List;
 public class AerospikeCompositeRecordOperation implements AerospikeRecordOperation {
 
     /**
-     * List of [{@link AerospikeSingleRecordOperation}]
+     * List of {@link AerospikeSingleRecordOperation}
      */
     private final List<AerospikeSingleRecordOperation> operations;
 

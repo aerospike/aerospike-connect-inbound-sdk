@@ -31,7 +31,7 @@ import java.util.List;
 
 /**
  * Represents an Aerospike single record transaction specified as a list of
- * [{@link Operation}]s.
+ * {@link Operation}s.
  */
 @AllArgsConstructor
 @EqualsAndHashCode

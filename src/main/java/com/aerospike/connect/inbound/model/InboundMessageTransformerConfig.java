@@ -18,8 +18,9 @@
 
 package com.aerospike.connect.inbound.model;
 
-import com.aerospike.connect.inbound.InboundMessageTransform;
+import com.aerospike.connect.inbound.InboundMessageTransformer;
 import com.aerospike.connect.inbound.operation.AerospikeCompositeRecordOperation;
+import com.aerospike.connect.inbound.operation.AerospikeRecordOperation;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -34,24 +35,23 @@ import java.util.Map;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Getter
-public class InboundMessageTransformConfig {
+public class InboundMessageTransformerConfig {
     /**
-     * Class to be used for converting inbound messages to the [{@link
-     * com.aerospike.connect.inbound.operation.AerospikeRecordOperation}].
+     * Class to be used for converting inbound messages to the {@link AerospikeRecordOperation}.
      */
     @JsonProperty("class")
-    private final Class<? extends InboundMessageTransform<?>>
-            inboundMessageTransformClass;
+    private final Class<? extends InboundMessageTransformer<?>>
+            inboundMessageTransformerClass;
 
     /**
-     * Custom parameters to be used by the custom transform.
+     * Custom parameters to be used by the custom transformer.
      */
     @Nullable
     @JsonProperty("params")
     private final Map<String, Object> transformConfig;
 
     /**
-     * Whether to allow [{@link AerospikeCompositeRecordOperation}] or not.
+     * Whether to allow {@link AerospikeCompositeRecordOperation} or not.
      */
     @JsonProperty("unsafe-composite-record-operations")
     private final boolean unsafeCompositeRecordOperation;
@@ -59,8 +59,8 @@ public class InboundMessageTransformConfig {
     /**
      * Private constructor for Jackson.
      */
-    private InboundMessageTransformConfig() {
-        inboundMessageTransformClass = null;
+    private InboundMessageTransformerConfig() {
+        inboundMessageTransformerClass = null;
         transformConfig = null;
         unsafeCompositeRecordOperation = false;
     }
