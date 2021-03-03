@@ -20,7 +20,7 @@ package com.aerospike.connect.kafka.inbound;
 
 import com.aerospike.client.Bin;
 import com.aerospike.client.Key;
-import com.aerospike.connect.inbound.InboundMessageTransform;
+import com.aerospike.connect.inbound.InboundMessageTransformer;
 import com.aerospike.connect.inbound.model.InboundMessage;
 import com.aerospike.connect.inbound.operation.AerospikeDeleteOperation;
 import com.aerospike.connect.inbound.operation.AerospikePutOperation;
@@ -30,10 +30,10 @@ import org.apache.kafka.connect.sink.SinkRecord;
 import static java.util.Collections.singletonList;
 
 /**
- * Custom inbound transform example with kafka tombstone record.
+ * Custom message transformer example with kafka tombstone record.
  */
 public final class KafkaTombstoneInboundMessageTransform
-        implements InboundMessageTransform<InboundMessage<Object, SinkRecord>> {
+        implements InboundMessageTransformer<InboundMessage<Object, SinkRecord>> {
 
     @Override
     public AerospikeRecordOperation transform(

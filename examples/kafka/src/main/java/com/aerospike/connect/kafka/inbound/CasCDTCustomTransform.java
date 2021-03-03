@@ -16,6 +16,8 @@
  *  the License.
  */
 
+package com.aerospike.connect.kafka.inbound;
+
 import com.aerospike.client.AerospikeException;
 import com.aerospike.client.Bin;
 import com.aerospike.client.Key;
@@ -24,10 +26,9 @@ import com.aerospike.client.Record;
 import com.aerospike.client.Value;
 import com.aerospike.client.cdt.ListOperation;
 import com.aerospike.connect.inbound.AerospikeReader;
-import com.aerospike.connect.inbound.Constants;
-import com.aerospike.connect.inbound.InboundMessageTransform;
+import com.aerospike.connect.inbound.InboundMessageTransformer;
 import com.aerospike.connect.inbound.model.InboundMessage;
-import com.aerospike.connect.inbound.model.InboundMessageTransformConfig;
+import com.aerospike.connect.inbound.model.InboundMessageTransformerConfig;
 import com.aerospike.connect.inbound.operation.AerospikeOperateOperation;
 import com.aerospike.connect.inbound.operation.AerospikePutOperation;
 import com.aerospike.connect.inbound.operation.AerospikeRecordOperation;
@@ -36,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
  */
 @Singleton
 public class CasCDTCustomTransform implements
-        InboundMessageTransform<InboundMessage<Object, Object>> {
+        InboundMessageTransformer<InboundMessage<Object, Object>> {
 
     private static final Logger logger = LoggerFactory.getLogger(CasCDTCustomTransform.class.getName());
 
@@ -60,16 +60,15 @@ public class CasCDTCustomTransform implements
      */
     private final AerospikeReader aerospikeReader;
     /**
-     * Inbound message transform config for the topic against which this class
-     * is bound
+     * Inbound message transformer config for the topic against which this class is bound.
      */
-    private final InboundMessageTransformConfig inboundMessageTransformConfig;
+    private final InboundMessageTransformerConfig inboundMessageTransformerConfig;
 
     @Inject
     public CasCDTCustomTransform(AerospikeReader aerospikeReader,
-                                 InboundMessageTransformConfig inboundMessageTransformConfig) {
+                                 InboundMessageTransformerConfig inboundMessageTransformerConfig) {
         this.aerospikeReader = aerospikeReader;
-        this.inboundMessageTransformConfig = inboundMessageTransformConfig;
+        this.inboundMessageTransformerConfig = inboundMessageTransformerConfig;
     }
 
     @Override
@@ -108,9 +107,10 @@ public class CasCDTCustomTransform implements
             cdrList.add(newCdr);
             bins.add(new Bin("cdrs", cdrList));
 
-            bins.add(new Bin("topicName", inboundMessageTransformConfig.getTransformConfig().get("topicName")));
+            bins.add(new Bin("topicName",
+                    Objects.requireNonNull(inboundMessageTransformerConfig.getTransformConfig()).get("topicName")));
             // Add all config fields as a Bin
-            bins.addAll(Objects.requireNonNull(inboundMessageTransformConfig.getTransformConfig())
+            bins.addAll(Objects.requireNonNull(inboundMessageTransformerConfig.getTransformConfig())
                     .entrySet()
                     .stream()
                     .map(e -> new Bin(e.getKey(), e.getValue()))
@@ -130,6 +130,7 @@ public class CasCDTCustomTransform implements
 
             // Append the CDR if the list is small, else first truncate the
             // list.
+            @SuppressWarnings("unchecked")
             List<String> existingCdrs = (List<String>) existingRecord.bins.get("cdrs");
 
             int cdrMaxCapacity = 2;

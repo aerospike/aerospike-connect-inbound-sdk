@@ -23,7 +23,7 @@ import com.aerospike.client.Operation;
 import com.aerospike.client.Value;
 import com.aerospike.client.cdt.*;
 import com.aerospike.client.policy.WritePolicy;
-import com.aerospike.connect.inbound.InboundMessageTransform;
+import com.aerospike.connect.inbound.InboundMessageTransformer;
 import com.aerospike.connect.inbound.model.InboundMessage;
 import com.aerospike.connect.inbound.operation.AerospikeOperateOperation;
 import com.aerospike.connect.inbound.operation.AerospikeRecordOperation;
@@ -43,7 +43,7 @@ import java.util.Map;
  */
 @Singleton
 public class CDTCustomTransform implements
-        InboundMessageTransform<InboundMessage<Object, Object>> {
+        InboundMessageTransformer<InboundMessage<Object, Object>> {
 
     private static final Logger logger = LoggerFactory.getLogger(CDTCustomTransform.class.getName());
 
@@ -73,6 +73,7 @@ public class CDTCustomTransform implements
                .
           }
          */
+        @SuppressWarnings("unchecked")
         Map<String, ?> rocket = (Map<String, ?>) fields.get("rocket");
 
         /*

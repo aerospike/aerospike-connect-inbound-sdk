@@ -1,1 +1,1 @@
-Kafka Inbound custom transform example using `maven`.
+Kafka Inbound message transformer example using `maven`.
