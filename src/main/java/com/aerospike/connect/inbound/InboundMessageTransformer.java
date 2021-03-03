@@ -21,23 +21,24 @@ package com.aerospike.connect.inbound;
 import com.aerospike.connect.inbound.operation.AerospikeRecordOperation;
 
 /**
- * Generate [{@link AerospikeRecordOperation}] from the com.aerospike.connect.inbound
- * record coming from some external system.
+ * Generate an {@link AerospikeRecordOperation} from an incoming message.
  *
  * <ul>
  *   <li> If you annotate your implementation with
  *   <a href="https://docs.oracle.com/javaee/7/api/javax/inject/Singleton.html">@Singleton</a>,
  *   it has to be thread safe because the same instance can be used by multiple threads.
  *   </li>
- *   <li> If not annotated with Singleton, then a new instance of transform will be created for every incoming message.
+ *   <li> If not annotated with Singleton, then a new instance of transformer will be created for every incoming
+ *   message.
  *   </li>
  * </ul>
  *
  * @param <T> incoming message type
  */
-public interface InboundMessageTransform<T> {
+public interface InboundMessageTransformer<T> {
     /**
-     * Transforms generic input message/record into [{@link AerospikeRecordOperation}] to apply on the Aerospike database.
+     * Transforms generic input message/record into {@link AerospikeRecordOperation} to apply on the Aerospike
+     * database.
      *
      * @param input Inbound message from the external system.
      * @return the operation to apply.
