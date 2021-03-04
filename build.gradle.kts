@@ -175,7 +175,7 @@ allprojects {
                 }
                 pom {
                     name.set("Aerospike Connect Inbound SDK")
-                    description.set("Inbound SDK for custom transforms or other plugins.")
+                    description.set("Inbound SDK for message transformer or other plugins.")
                     url.set("https://github.com/aerospike/aerospike-connect-inbound-sdk")
                     licenses {
                         license {

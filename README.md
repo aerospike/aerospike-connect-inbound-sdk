@@ -1,6 +1,6 @@
 # Aerospike Connect Inbound SDK
 
-SDK for building custom transforms or plugins for
+SDK for building message transformer or plugins for
 [Aerospike inbound connectors](https://www.aerospike.com/docs/connect/index.html).
 
 ## Usage

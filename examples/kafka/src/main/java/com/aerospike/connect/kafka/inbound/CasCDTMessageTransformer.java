@@ -45,15 +45,15 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * An example custom transforms that appends incoming CDR (Call Detail Record)
+ * An example message transformer that appends incoming CDR (Call Detail Record)
  * to existing record in case it exists. If the list becomes too large it
  * is trimmed.
  */
 @Singleton
-public class CasCDTCustomTransform implements
+public class CasCDTMessageTransformer implements
         InboundMessageTransformer<InboundMessage<Object, Object>> {
 
-    private static final Logger logger = LoggerFactory.getLogger(CasCDTCustomTransform.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(CasCDTMessageTransformer.class.getName());
 
     /**
      * Injected aerospike reader to read records from Aerospike.
@@ -65,8 +65,8 @@ public class CasCDTCustomTransform implements
     private final InboundMessageTransformerConfig inboundMessageTransformerConfig;
 
     @Inject
-    public CasCDTCustomTransform(AerospikeReader aerospikeReader,
-                                 InboundMessageTransformerConfig inboundMessageTransformerConfig) {
+    public CasCDTMessageTransformer(AerospikeReader aerospikeReader,
+                                    InboundMessageTransformerConfig inboundMessageTransformerConfig) {
         this.aerospikeReader = aerospikeReader;
         this.inboundMessageTransformerConfig = inboundMessageTransformerConfig;
     }
