@@ -30,9 +30,9 @@ import org.apache.kafka.connect.sink.SinkRecord;
 import static java.util.Collections.singletonList;
 
 /**
- * Custom message transformer example with kafka tombstone record.
+ * Message transformer example with kafka tombstone record.
  */
-public final class KafkaTombstoneInboundMessageTransform
+public final class KafkaTombstoneMessageTransformer
         implements InboundMessageTransformer<InboundMessage<Object, SinkRecord>> {
 
     @Override

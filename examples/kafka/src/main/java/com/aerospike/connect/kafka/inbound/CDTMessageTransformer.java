@@ -42,14 +42,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * An example custom transforms that modifies a rocket dealerships inventory
+ * An example message transformer that modifies a rocket dealerships inventory
  * and sales record upon the sale of a rocket.
  */
 @Singleton
-public class CDTCustomTransform implements
+public class CDTMessageTransformer implements
         InboundMessageTransformer<InboundMessage<Object, Object>> {
 
-    private static final Logger logger = LoggerFactory.getLogger(CDTCustomTransform.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(CDTMessageTransformer.class.getName());
 
     @Override
     public AerospikeRecordOperation transform(InboundMessage<Object, Object> input) {

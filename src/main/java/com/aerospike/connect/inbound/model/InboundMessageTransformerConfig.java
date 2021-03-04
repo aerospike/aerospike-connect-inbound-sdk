@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
 import java.util.Map;
 
 /**
- * Config used by the custom transformer for the Inbound messages.
+ * Config used by the message transformer for the Inbound messages.
  */
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -44,7 +44,7 @@ public class InboundMessageTransformerConfig {
             inboundMessageTransformerClass;
 
     /**
-     * Custom parameters to be used by the custom transformer.
+     * Custom parameters to be used by the message transformer.
      */
     @Nullable
     @JsonProperty("params")
