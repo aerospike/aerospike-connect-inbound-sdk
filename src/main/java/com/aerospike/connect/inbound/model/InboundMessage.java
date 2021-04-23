@@ -91,14 +91,35 @@ public class InboundMessage<K, M> {
     @Nonnull
     private final List<Integer> ignorableResultCodes;
 
+    /**
+     * Return the key of the message. Is present only if the external system
+     * associates a key with the message.
+     *
+     * <p>
+     * For example in Kafka it will be the value returned by
+     * org.apache.kafka.connect.connector.SinkRecord#key method.
+     * </p>
+     */
     public Optional<K> getMessageKey() {
         return Optional.ofNullable(messageKey);
     }
 
+    /**
+     * Return the Aerospike record key extracted from the message by the
+     * Aerospike inbound connector. It will be present only if the Aerospike
+     * inbound connector config specifies extracting an Aerospike key from the
+     * incoming message.
+     */
     public Optional<Key> getKey() {
         return Optional.ofNullable(key);
     }
 
+    /**
+     * Return the Aerospike write policy generated from the message by the
+     * Aerospike inbound connector. It will be present only if the Aerospike
+     * inbound connector config specifies extracting {@link WritePolicy}
+     * attributes from the incoming message.
+     */
     public Optional<WritePolicy> getWritePolicy() {
         return Optional.ofNullable(writePolicy);
     }
