@@ -18,11 +18,14 @@
 
 package com.aerospike.connect.inbound.operation;
 
+import com.aerospike.client.AerospikeException;
 import com.aerospike.client.Key;
 import com.aerospike.client.policy.WritePolicy;
+import com.sun.istack.internal.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * An Aerospike single record operation.
@@ -40,4 +43,19 @@ public interface AerospikeSingleRecordOperation extends AerospikeRecordOperation
      */
     @Nullable
     WritePolicy getWritePolicy();
+
+    /**
+     * Error {@link com.aerospike.client.ResultCode}s to be ignored. Failed operation
+     * will be considered successful if the result code is in the given list.
+     *
+     * <p>
+     * For example, if a record should only be created once and never updated
+     * in Aerospike database, set {@link WritePolicy#recordExistsAction} to
+     * {@link com.aerospike.client.policy.RecordExistsAction#CREATE_ONLY} and
+     * specify that an {@link AerospikeException} with resultCode
+     * {@link com.aerospike.client.ResultCode#KEY_EXISTS_ERROR} should be ignored.
+     * </p>
+     */
+    @NotNull
+    List<Integer> getIgnorableResultCodes();
 }

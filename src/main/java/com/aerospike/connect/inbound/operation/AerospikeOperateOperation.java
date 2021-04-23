@@ -24,9 +24,11 @@ import com.aerospike.client.policy.WritePolicy;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,19 +36,18 @@ import java.util.List;
  * {@link Operation}s.
  */
 @AllArgsConstructor
+@RequiredArgsConstructor
 @EqualsAndHashCode
 @Getter
 public class AerospikeOperateOperation implements AerospikeSingleRecordOperation {
-
     /**
-     * The Aerospike record key.
+     * @see AerospikeSingleRecordOperation#getKey()
      */
     @Nonnull
     private final Key key;
 
     /**
-     * The write policy to use for this operation. Defaults to null implying the
-     * default write policy.
+     * @see AerospikeSingleRecordOperation#getWritePolicy()
      */
     @Nullable
     private final WritePolicy writePolicy;
@@ -56,4 +57,10 @@ public class AerospikeOperateOperation implements AerospikeSingleRecordOperation
      * {@link #key}
      */
     private final List<Operation> operations;
+
+    /**
+     * @see AerospikeSingleRecordOperation#getIgnorableResultCodes()
+     */
+    @SuppressWarnings("FieldMayBeFinal")
+    private List<Integer> ignorableResultCodes = Collections.emptyList();
 }
