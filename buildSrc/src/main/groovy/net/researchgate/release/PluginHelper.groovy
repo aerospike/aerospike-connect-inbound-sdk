@@ -8,6 +8,9 @@
  * file that was distributed with this source code.
  */
 
+/*
+ * The file contains Aerospike, Inc. patches.
+ */
 package net.researchgate.release
 
 import groovy.text.SimpleTemplateEngine
