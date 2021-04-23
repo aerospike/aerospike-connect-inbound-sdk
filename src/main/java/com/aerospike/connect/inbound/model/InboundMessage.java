@@ -27,9 +27,9 @@ import lombok.Getter;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * A message from an external system like Kafka, Pulsar, etc processed by a
@@ -89,7 +89,7 @@ public class InboundMessage<K, M> {
      * @see AerospikeSingleRecordOperation#getIgnorableResultCodes()
      */
     @Nonnull
-    private final List<Integer> ignorableResultCodes;
+    private final Set<Integer> ignorableResultCodes;
 
     /**
      * Return the key of the message. Is present only if the external system
