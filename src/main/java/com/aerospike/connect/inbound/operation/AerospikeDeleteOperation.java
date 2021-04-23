@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a standard Aerospike KVS delete operation.
@@ -55,5 +55,5 @@ public class AerospikeDeleteOperation implements AerospikeSingleRecordOperation 
      */
     @SuppressWarnings("FieldMayBeFinal")
     @Nonnull
-    private List<Integer> ignorableResultCodes = Collections.emptyList();
+    private Set<Integer> ignorableResultCodes = Collections.emptySet();
 }

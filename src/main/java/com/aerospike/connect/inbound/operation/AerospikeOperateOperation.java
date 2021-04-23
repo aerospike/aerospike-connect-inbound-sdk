@@ -30,6 +30,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents an Aerospike single record transaction specified as a list of
@@ -63,5 +64,5 @@ public class AerospikeOperateOperation implements AerospikeSingleRecordOperation
      */
     @SuppressWarnings("FieldMayBeFinal")
     @Nonnull
-    private List<Integer> ignorableResultCodes = Collections.emptyList();
+    private Set<Integer> ignorableResultCodes = Collections.emptySet();
 }

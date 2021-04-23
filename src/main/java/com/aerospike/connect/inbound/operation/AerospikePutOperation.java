@@ -30,6 +30,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a standard Aerospike KVS put operation.
@@ -61,5 +62,5 @@ public class AerospikePutOperation implements AerospikeSingleRecordOperation {
      */
     @SuppressWarnings("FieldMayBeFinal")
     @Nonnull
-    private List<Integer> ignorableResultCodes = Collections.emptyList();
+    private Set<Integer> ignorableResultCodes = Collections.emptySet();
 }

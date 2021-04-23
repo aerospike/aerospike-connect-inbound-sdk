@@ -24,7 +24,7 @@ import com.aerospike.client.policy.WritePolicy;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
+import java.util.Set;
 
 /**
  * An Aerospike single record operation.
@@ -56,5 +56,5 @@ public interface AerospikeSingleRecordOperation extends AerospikeRecordOperation
      * </p>
      */
     @Nonnull
-    List<Integer> getIgnorableResultCodes();
+    Set<Integer> getIgnorableResultCodes();
 }
