@@ -109,7 +109,7 @@ allprojects {
     }
 
     project.extensions.configure(ReleaseExtension::class) {
-        tagTemplate = "$name-$version"
+        tagTemplate = "$version"
     }
 
     tasks.getByName("afterReleaseBuild").dependsOn("publish")
