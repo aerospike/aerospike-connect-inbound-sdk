@@ -20,11 +20,14 @@ package com.aerospike.connect.inbound.model;
 
 import com.aerospike.client.Key;
 import com.aerospike.client.policy.WritePolicy;
+import com.aerospike.connect.inbound.operation.AerospikeSingleRecordOperation;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -81,6 +84,12 @@ public class InboundMessage<K, M> {
      * for the Aerospike inbound connector.
      */
     private final Map<String, Object> fields;
+
+    /**
+     * @see AerospikeSingleRecordOperation#getIgnorableResultCodes()
+     */
+    @Nonnull
+    private final List<Integer> ignorableResultCodes;
 
     public Optional<K> getMessageKey() {
         return Optional.ofNullable(messageKey);
