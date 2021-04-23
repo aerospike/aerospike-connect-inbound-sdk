@@ -21,7 +21,6 @@ package com.aerospike.connect.inbound.operation;
 import com.aerospike.client.AerospikeException;
 import com.aerospike.client.Key;
 import com.aerospike.client.policy.WritePolicy;
-import com.sun.istack.internal.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -56,6 +55,6 @@ public interface AerospikeSingleRecordOperation extends AerospikeRecordOperation
      * {@link com.aerospike.client.ResultCode#KEY_EXISTS_ERROR} should be ignored.
      * </p>
      */
-    @NotNull
+    @Nonnull
     List<Integer> getIgnorableResultCodes();
 }

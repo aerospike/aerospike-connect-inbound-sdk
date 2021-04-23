@@ -60,5 +60,6 @@ public class AerospikePutOperation implements AerospikeSingleRecordOperation {
      * @see AerospikeSingleRecordOperation#getIgnorableResultCodes()
      */
     @SuppressWarnings("FieldMayBeFinal")
+    @Nonnull
     private List<Integer> ignorableResultCodes = Collections.emptyList();
 }
