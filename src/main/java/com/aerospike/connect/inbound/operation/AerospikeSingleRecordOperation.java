@@ -45,7 +45,7 @@ public interface AerospikeSingleRecordOperation extends AerospikeRecordOperation
 
     /**
      * Error {@link com.aerospike.client.ResultCode}s to be ignored. Failed operation
-     * will be considered successful if the result code is in the given list.
+     * will be considered successful if the result code is in the given set.
      *
      * <p>
      * For example, if a record should only be created once and never updated
