@@ -2,7 +2,7 @@
 
 <!--
   ~
-  ~  Copyright 2012-2021 Aerospike, Inc.
+  ~  Copyright 2012-2020 Aerospike, Inc.
   ~
   ~  Portions may be licensed to Aerospike, Inc. under one or more contributor
   ~  license agreements WHICH ARE COMPATIBLE WITH THE APACHE LICENSE, VERSION 2.0.
@@ -24,7 +24,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.aerospike</groupId>
-    <artifactId>kafka-message-transformer-example</artifactId>
+    <artifactId>pulsar-message-transformer-example</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <dependencies>
@@ -43,11 +43,6 @@
             <artifactId>javax.inject</artifactId>
             <version>1</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>connect-api</artifactId>
-            <version>2.3.0</version>
-        </dependency>
     </dependencies>
 
     <properties>
@@ -62,5 +57,4 @@
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
     </repositories>
-
 </project>
