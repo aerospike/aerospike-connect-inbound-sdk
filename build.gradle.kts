@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2012-2020 Aerospike, Inc.
+ *  Copyright 2012-2021 Aerospike, Inc.
  *
  *  Portions may be licensed to Aerospike, Inc. under one or more contributor
  *  license agreements WHICH ARE COMPATIBLE WITH THE APACHE LICENSE, VERSION 2.0.
@@ -84,21 +84,32 @@ allprojects {
 
         // Common test dependencies.
         "testImplementation"(
-                "org.junit.jupiter:junit-jupiter-api:5.4.2"
+            "org.junit.jupiter:junit-jupiter-api:5.4.2"
         )
         "testImplementation"(
-                "org.junit.jupiter:junit-jupiter-params:5.4.2"
+            "org.junit.jupiter:junit-jupiter-params:5.4.2"
         )
         "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.4.2")
     }
 
     val compileJava: JavaCompile by tasks
     compileJava.targetCompatibility = "1.8"
+    compileJava.options.apply {
+        compilerArgs.add("-Xlint:all")
+        compilerArgs.add("-Werror")
+        compilerArgs.add("-Xlint:-processing")
+    }
+
     val compileTestJava: JavaCompile by tasks
     compileTestJava.targetCompatibility = "1.8"
+    compileTestJava.options.apply {
+        compilerArgs.add("-Xlint:all")
+        compilerArgs.add("-Werror")
+        compilerArgs.add("-Xlint:-processing")
+    }
 
     project.extensions.configure(ReleaseExtension::class) {
-        tagTemplate = "$name-$version"
+        tagTemplate = "$version"
     }
 
     tasks.getByName("afterReleaseBuild").dependsOn("publish")

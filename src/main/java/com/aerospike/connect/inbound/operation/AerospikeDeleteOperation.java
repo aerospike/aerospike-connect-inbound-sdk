@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2012-2020 Aerospike, Inc.
+ *  Copyright 2012-2021 Aerospike, Inc.
  *
  *  Portions may be licensed to Aerospike, Inc. under one or more contributor
  *  license agreements WHICH ARE COMPATIBLE WITH THE APACHE LICENSE, VERSION 2.0.
@@ -23,29 +23,37 @@ import com.aerospike.client.policy.WritePolicy;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Represents a standard Aerospike KVS delete operation.
  */
 @AllArgsConstructor
+@RequiredArgsConstructor
 @EqualsAndHashCode
 @Getter
 public class AerospikeDeleteOperation implements AerospikeSingleRecordOperation {
-
     /**
-     * The Aerospike record key.
+     * @see AerospikeSingleRecordOperation#getKey()
      */
     @Nonnull
     private final Key key;
 
     /**
-     * The write policy to use for this operation. Defaults to null implying the
-     * default write policy.
+     * @see AerospikeSingleRecordOperation#getWritePolicy()
      */
     @Nullable
     private final WritePolicy writePolicy;
 
+    /**
+     * @see AerospikeSingleRecordOperation#getIgnorableResultCodes()
+     */
+    @SuppressWarnings("FieldMayBeFinal")
+    @Nonnull
+    private Set<Integer> ignorableResultCodes = Collections.emptySet();
 }

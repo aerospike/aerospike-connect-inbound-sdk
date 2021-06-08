@@ -16,10 +16,20 @@
  *  the License.
  */
 
-package com.aerospike.connect.inbound.operation;
+plugins {
+    `kotlin-dsl`
+    "groovy"
+    "java-gradle-plugin"
+}
 
-/**
- * The class to be used for cases when inbound record from the external system should be skipped.
- */
-public class AerospikeSkipRecordOperation implements AerospikeRecordOperation {
+kotlinDslPluginOptions {
+    experimentalWarning.set(false)
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    api("net.researchgate:gradle-release:2.6.0")
 }
