@@ -31,7 +31,7 @@
         <dependency>
             <groupId>com.aerospike</groupId>
             <artifactId>aerospike-connect-inbound-sdk</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
@@ -50,11 +50,4 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
-    <!-- TODO remove this once release is done and update the SDK version above -->
-    <repositories>
-        <repository>
-            <id>maven-snapshot</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>
-    </repositories>
 </project>

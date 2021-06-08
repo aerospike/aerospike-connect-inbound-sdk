@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -123,8 +124,10 @@ public class CasCDTMessageTransformer implements
                     .map(e -> new Bin(e.getKey(), e.getValue()))
                     .collect(Collectors.toList())
             );
-            // TODO add ignorable error codes sample once PR#14 is merged. Check for kafka example as well.
-            return new AerospikePutOperation(aerospikeKey, null, bins);
+            // These error codes are sent in inboundMessage by Aerospike if you have configured them in
+            // aerospike-pulsar-inbound.yml.
+            Set<Integer> ignorableResultCodes = inboundMessage.getIgnorableResultCodes();
+            return new AerospikePutOperation(aerospikeKey, null, bins, ignorableResultCodes);
         } else {
             // List of Aerospike operations.
             List<Operation> operations = new ArrayList<>();
