@@ -32,7 +32,7 @@ import static java.util.Collections.singletonList;
 /**
  * Message transformer example with kafka tombstone record.
  */
-public final class KafkaTombstoneMessageTransformer
+public class KafkaTombstoneMessageTransformer
         implements InboundMessageTransformer<InboundMessage<Object, SinkRecord>> {
 
     @Override

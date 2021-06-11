@@ -86,7 +86,7 @@ public class InboundMessage<K, M> {
     private final Map<String, Object> fields;
 
     /**
-     * @see AerospikeSingleRecordOperation#getIgnorableResultCodes()
+     * @see AerospikeSingleRecordOperation#getNoRetryErrorCodes()
      */
     @Nonnull
     private final Set<Integer> ignorableResultCodes;

@@ -60,9 +60,9 @@ public class AerospikeOperateOperation implements AerospikeSingleRecordOperation
     private final List<Operation> operations;
 
     /**
-     * @see AerospikeSingleRecordOperation#getIgnorableResultCodes()
+     * @see AerospikeSingleRecordOperation#getNoRetryErrorCodes()
      */
     @SuppressWarnings("FieldMayBeFinal")
     @Nonnull
-    private Set<Integer> ignorableResultCodes = Collections.emptySet();
+    private Set<Integer> noRetryErrorCodes = Collections.emptySet();
 }
