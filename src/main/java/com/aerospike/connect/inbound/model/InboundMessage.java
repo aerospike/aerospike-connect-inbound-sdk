@@ -89,7 +89,7 @@ public class InboundMessage<K, M> {
      * @see AerospikeSingleRecordOperation#getNoRetryErrorCodes()
      */
     @Nonnull
-    private final Set<Integer> ignorableResultCodes;
+    private final Set<Integer> noRetryErrorCodes;
 
     /**
      * Return the key of the message. Is present only if the external system
