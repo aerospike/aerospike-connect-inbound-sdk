@@ -56,5 +56,5 @@ public interface AerospikeSingleRecordOperation extends AerospikeRecordOperation
      * </p>
      */
     @Nonnull
-    Set<Integer> getNoRetryErrorCodes();
+    Set<Integer> getIgnorableResultCodes();
 }

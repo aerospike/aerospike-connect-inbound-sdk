@@ -58,9 +58,9 @@ public class AerospikePutOperation implements AerospikeSingleRecordOperation {
     private final List<Bin> bins;
 
     /**
-     * @see AerospikeSingleRecordOperation#getNoRetryErrorCodes()
+     * @see AerospikeSingleRecordOperation#getIgnorableResultCodes()
      */
     @SuppressWarnings("FieldMayBeFinal")
     @Nonnull
-    private Set<Integer> noRetryErrorCodes = Collections.emptySet();
+    private Set<Integer> ignorableResultCodes = Collections.emptySet();
 }

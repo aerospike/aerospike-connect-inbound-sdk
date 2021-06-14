@@ -86,10 +86,10 @@ public class InboundMessage<K, M> {
     private final Map<String, Object> fields;
 
     /**
-     * @see AerospikeSingleRecordOperation#getNoRetryErrorCodes()
+     * @see AerospikeSingleRecordOperation#getIgnorableResultCodes()
      */
     @Nonnull
-    private final Set<Integer> noRetryErrorCodes;
+    private final Set<Integer> ignorableResultCodes;
 
     /**
      * Return the key of the message. Is present only if the external system
