@@ -51,9 +51,9 @@ public class AerospikeDeleteOperation implements AerospikeSingleRecordOperation 
     private final WritePolicy writePolicy;
 
     /**
-     * @see AerospikeSingleRecordOperation#getIgnorableResultCodes()
+     * @see AerospikeSingleRecordOperation#getIgnoreErrorCodes()
      */
     @SuppressWarnings("FieldMayBeFinal")
     @Nonnull
-    private Set<Integer> ignorableResultCodes = Collections.emptySet();
+    private Set<Integer> ignoreErrorCodes = Collections.emptySet();
 }

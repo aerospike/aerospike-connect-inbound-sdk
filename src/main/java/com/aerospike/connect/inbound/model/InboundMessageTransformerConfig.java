@@ -48,7 +48,7 @@ public class InboundMessageTransformerConfig {
      */
     @Nullable
     @JsonProperty("params")
-    private final Map<String, Object> transformConfig;
+    private final Map<String, Object> transformerConfig;
 
     /**
      * Whether to allow {@link AerospikeCompositeRecordOperation} or not.
@@ -61,7 +61,18 @@ public class InboundMessageTransformerConfig {
      */
     private InboundMessageTransformerConfig() {
         inboundMessageTransformerClass = null;
-        transformConfig = null;
+        transformerConfig = null;
         unsafeCompositeRecordOperation = false;
+    }
+
+    /**
+     * Get the transformerConfig. The method has been deprecated as the transformerConfig field has been renamed.
+     *
+     * @return transformerConfig
+     */
+    @Nullable
+    @Deprecated
+    public Map<String, Object> getTransformConfig() {
+        return getTransformerConfig();
     }
 }
