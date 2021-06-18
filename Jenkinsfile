@@ -24,17 +24,17 @@ pipeline {
                     steps {
                         echo "Building.."
                         sh "./gradlew --no-daemon clean build"
-                        sh "mvn -f examples/kafka clean install"
-                        sh "mvn -f examples/pulsar clean install"
+                        sh "/opt/apache-maven-3.3.9/bin/mvn -f examples/kafka clean install"
+                        sh "/opt/apache-maven-3.3.9/bin/mvn -f examples/pulsar clean install"
                     }
                 }
             }
         }
     }
 
-//     post {
-//         cleanup {
-//             cleanWs()
-//         }
-//     }
+    post {
+        cleanup {
+            cleanWs()
+        }
+    }
 }
