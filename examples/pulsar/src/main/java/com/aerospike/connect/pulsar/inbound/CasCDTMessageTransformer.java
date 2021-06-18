@@ -126,8 +126,8 @@ public class CasCDTMessageTransformer implements
             );
             // These error codes are sent in inboundMessage by Aerospike if you have configured them in
             // aerospike-pulsar-inbound.yml.
-            Set<Integer> ignorableResultCodes = inboundMessage.getIgnorableResultCodes();
-            return new AerospikePutOperation(aerospikeKey, null, bins, ignorableResultCodes);
+            Set<Integer> ignoreErrorCodes = inboundMessage.getIgnoreErrorCodes();
+            return new AerospikePutOperation(aerospikeKey, null, bins, ignoreErrorCodes);
         } else {
             // List of Aerospike operations.
             List<Operation> operations = new ArrayList<>();
