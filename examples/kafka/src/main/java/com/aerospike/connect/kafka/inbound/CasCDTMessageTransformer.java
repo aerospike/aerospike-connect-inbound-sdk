@@ -94,7 +94,7 @@ public class CasCDTMessageTransformer implements
         Record existingRecord = null;
         // Read existing record.
         try {
-            existingRecord = aerospikeReader.getRecord(aerospikeKey);
+            existingRecord = aerospikeReader.get(null, aerospikeKey);
         } catch (AerospikeException ae) {
             // Java client throws an exception if record is not found for
             // the key in Aerospike
@@ -109,9 +109,9 @@ public class CasCDTMessageTransformer implements
             bins.add(new Bin("cdrs", cdrList));
 
             bins.add(new Bin("topicName",
-                    Objects.requireNonNull(inboundMessageTransformerConfig.getTransformConfig()).get("topicName")));
+                    Objects.requireNonNull(inboundMessageTransformerConfig.getTransformerConfig()).get("topicName")));
             // Add all config fields as a Bin
-            bins.addAll(Objects.requireNonNull(inboundMessageTransformerConfig.getTransformConfig())
+            bins.addAll(Objects.requireNonNull(inboundMessageTransformerConfig.getTransformerConfig())
                     .entrySet()
                     .stream()
                     .map(e -> new Bin(e.getKey(), e.getValue()))
