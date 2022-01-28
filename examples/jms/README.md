@@ -1,0 +1,1 @@
+JMS message transformer example using `maven`.
