@@ -26,7 +26,7 @@ pipeline {
                         sh "./gradlew --no-daemon clean build"
                         sh "mvn -f examples/jms clean install"
                         sh "mvn -f examples/kafka clean install"
-                        sh mvn -f examples/pulsar clean install"
+                        sh "mvn -f examples/pulsar clean install"
                     }
                 }
             }
