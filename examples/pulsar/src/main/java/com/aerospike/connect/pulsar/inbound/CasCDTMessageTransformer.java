@@ -25,6 +25,7 @@ import com.aerospike.client.Operation;
 import com.aerospike.client.Record;
 import com.aerospike.client.Value;
 import com.aerospike.client.cdt.ListOperation;
+import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.connect.inbound.AerospikeReader;
 import com.aerospike.connect.inbound.InboundMessageTransformer;
 import com.aerospike.connect.inbound.model.InboundMessage;
@@ -101,6 +102,7 @@ public class CasCDTMessageTransformer implements
             logger.error("Error while getting the record", ae);
         }
 
+        WritePolicy writePolicy = inboundMessage.getWritePolicy().orElse(null);
         if (existingRecord == null) {
             List<Bin> bins = new ArrayList<>();
 
@@ -127,7 +129,7 @@ public class CasCDTMessageTransformer implements
             // These error codes are sent in inboundMessage by Aerospike if you have configured them in
             // aerospike-pulsar-inbound.yml.
             Set<Integer> ignoreErrorCodes = inboundMessage.getIgnoreErrorCodes();
-            return new AerospikePutOperation(aerospikeKey, null, bins, ignoreErrorCodes);
+            return new AerospikePutOperation(aerospikeKey, writePolicy, bins, ignoreErrorCodes);
         } else {
             // List of Aerospike operations.
             List<Operation> operations = new ArrayList<>();
@@ -145,7 +147,7 @@ public class CasCDTMessageTransformer implements
             // Insert new CDR to the top of the list.
             operations.add(ListOperation.insert("cdrs", 0, Value.get(newCdr)));
 
-            return new AerospikeOperateOperation(aerospikeKey, null, operations);
+            return new AerospikeOperateOperation(aerospikeKey, writePolicy, operations);
         }
     }
 }

@@ -26,7 +26,6 @@ import com.aerospike.client.cdt.ListOperation;
 import com.aerospike.client.cdt.ListReturnType;
 import com.aerospike.client.cdt.MapOperation;
 import com.aerospike.client.cdt.MapPolicy;
-import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.connect.inbound.InboundMessageTransformer;
 import com.aerospike.connect.inbound.model.InboundMessage;
 import com.aerospike.connect.inbound.operation.AerospikeOperateOperation;
@@ -90,7 +89,7 @@ public class CDTMessageTransformer implements
 
         /*
           The "inventory" bin holds the dealerships list of rockets for sale.
-          Lets remove the rocket from the "inventory" bin.
+          Let's remove the rocket from the "inventory" bin.
          */
         operations.add(ListOperation.removeByValue("inventory",
                 Value.get(rocket), ListReturnType.NONE));
@@ -127,6 +126,6 @@ public class CDTMessageTransformer implements
         operations.add(MapOperation.putItems(new MapPolicy(), "top-sales-person",
                 topSalesPerson));
 
-        return new AerospikeOperateOperation(aerospikeKey, new WritePolicy(), operations);
+        return new AerospikeOperateOperation(aerospikeKey, input.getWritePolicy().orElse(null), operations);
     }
 }

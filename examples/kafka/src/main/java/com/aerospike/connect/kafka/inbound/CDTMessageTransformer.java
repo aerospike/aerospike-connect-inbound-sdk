@@ -26,7 +26,6 @@ import com.aerospike.client.cdt.ListOperation;
 import com.aerospike.client.cdt.ListReturnType;
 import com.aerospike.client.cdt.MapOperation;
 import com.aerospike.client.cdt.MapPolicy;
-import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.connect.inbound.InboundMessageTransformer;
 import com.aerospike.connect.inbound.model.InboundMessage;
 import com.aerospike.connect.inbound.operation.AerospikeOperateOperation;
@@ -126,7 +125,6 @@ public class CDTMessageTransformer implements
 
         operations.add(MapOperation.putItems(new MapPolicy(), "top-sales-person",
                 topSalesPerson));
-
-        return new AerospikeOperateOperation(aerospikeKey, new WritePolicy(), operations);
+        return new AerospikeOperateOperation(aerospikeKey, input.getWritePolicy().orElse(null), operations);
     }
 }

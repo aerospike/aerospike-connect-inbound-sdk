@@ -20,6 +20,7 @@ package com.aerospike.connect.kafka.inbound;
 
 import com.aerospike.client.Bin;
 import com.aerospike.client.Key;
+import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.connect.inbound.InboundMessageTransformer;
 import com.aerospike.connect.inbound.model.InboundMessage;
 import com.aerospike.connect.inbound.operation.AerospikeDeleteOperation;
@@ -38,12 +39,13 @@ public class KafkaTombstoneMessageTransformer
     @Override
     public AerospikeRecordOperation transform(
             InboundMessage<Object, SinkRecord> inboundMessage) {
+        WritePolicy writePolicy = inboundMessage.getWritePolicy().orElse(null);
         // Kafka tombstone record has non-null key and null payload
         if (inboundMessage.getMessage().value() == null) {
             return new AerospikeDeleteOperation(
-                    new Key("test", null, "jumbo_jet"), null);
+                    new Key("test", null, "jumbo_jet"), writePolicy);
         }
-        return new AerospikePutOperation(new Key("test", null, "kevin"), null,
+        return new AerospikePutOperation(new Key("test", null, "kevin"), writePolicy,
                 singletonList(new Bin("name",
                         inboundMessage.getFields().get("name"))));
     }
