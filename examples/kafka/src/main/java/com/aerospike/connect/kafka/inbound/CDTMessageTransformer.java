@@ -125,6 +125,7 @@ public class CDTMessageTransformer implements
 
         operations.add(MapOperation.putItems(new MapPolicy(), "top-sales-person",
                 topSalesPerson));
-        return new AerospikeOperateOperation(aerospikeKey, input.getWritePolicy().orElse(null), operations);
+        return new AerospikeOperateOperation(aerospikeKey, input.getWritePolicy().orElse(null), operations,
+                input.getIgnoreErrorCodes());
     }
 }
