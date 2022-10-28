@@ -37,6 +37,8 @@ plugins {
     `maven-publish`
     signing
     java
+
+    id("io.snyk.gradle.plugin.snykplugin")
 }
 
 allprojects {
@@ -54,6 +56,7 @@ allprojects {
         plugin("jacoco")
         plugin("maven-publish")
         plugin("net.researchgate.release")
+        plugin("io.snyk.gradle.plugin.snykplugin")
     }
 
     repositories {
@@ -169,6 +172,36 @@ allprojects {
     java {
         withJavadocJar()
         withSourcesJar()
+    }
+
+    tasks.javadoc {
+        options {
+            this as StandardJavadocDocletOptions
+
+            // Fail on Javadoc lint errors.
+            addBooleanOption("Xdoclint:all", true)
+            // This is a hack as we are not using Java15+.
+            // See https://stackoverflow.com/a/49544352/5611068.
+            addStringOption("Xwerror", "-quiet")
+        }
+    }
+
+    val snykTokens: String by project
+    val snykToken = snykTokens.split(",").map { it.trim() }.random()
+
+    tasks.create<Exec>("setup-snyk") {
+        commandLine("${project.rootDir}/snyk", "auth", snykToken)
+    }
+    tasks.getByName("snyk-check-binary").finalizedBy("setup-snyk")
+
+    /**
+     * Vulnerability scanning with Snyk.
+     */
+    configure<io.snyk.gradle.plugin.SnykExtension> {
+        setApi(snykToken)
+        setSeverity("high")
+        setAutoDownload(true)
+        setArguments("--sub-project=" + project.name)
     }
 }
 

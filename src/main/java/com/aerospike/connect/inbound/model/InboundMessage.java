@@ -34,7 +34,7 @@ import java.util.Set;
 /**
  * A message from an external system like Kafka, Pulsar, etc processed by a
  * Aerospike inbound connector.
- *
+ * <br>
  * The message is processed by the Aerospike inbound connector as specified in
  * its config and converted to a InboundMessage.
  */
@@ -99,6 +99,8 @@ public class InboundMessage<K, M> {
      * For example in Kafka it will be the value returned by
      * org.apache.kafka.connect.connector.SinkRecord#key method.
      * </p>
+     *
+     * @return An optional message key.
      */
     public Optional<K> getMessageKey() {
         return Optional.ofNullable(messageKey);
@@ -109,6 +111,8 @@ public class InboundMessage<K, M> {
      * Aerospike inbound connector. It will be present only if the Aerospike
      * inbound connector config specifies extracting an Aerospike key from the
      * incoming message.
+     *
+     * @return An optional Aerospike record key.
      */
     public Optional<Key> getKey() {
         return Optional.ofNullable(key);
@@ -119,6 +123,8 @@ public class InboundMessage<K, M> {
      * Aerospike inbound connector. It will be present only if the Aerospike
      * inbound connector config specifies extracting {@link WritePolicy}
      * attributes from the incoming message.
+     *
+     * @return An optional {@link WritePolicy}.
      */
     public Optional<WritePolicy> getWritePolicy() {
         return Optional.ofNullable(writePolicy);
