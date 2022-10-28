@@ -29,6 +29,13 @@ pipeline {
                         sh "mvn -f examples/pulsar clean install"
                     }
                 }
+
+                stage("Vulnerability scanning") {
+                    steps {
+                       echo "Running snyk scan.."
+                       sh "./gradlew --no-daemon snyk-test"
+                    }
+                }
             }
         }
     }
