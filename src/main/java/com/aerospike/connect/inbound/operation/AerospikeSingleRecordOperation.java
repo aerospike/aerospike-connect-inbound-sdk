@@ -54,6 +54,8 @@ public interface AerospikeSingleRecordOperation extends AerospikeRecordOperation
      * specify that an {@link AerospikeException} with resultCode
      * {@link com.aerospike.client.ResultCode#KEY_EXISTS_ERROR} should be ignored.
      * </p>
+     *
+     * @return Set of Aerospike errors to ignore.
      */
     @Nonnull
     Set<Integer> getIgnoreErrorCodes();

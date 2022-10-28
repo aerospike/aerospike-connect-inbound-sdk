@@ -177,9 +177,12 @@ allprojects {
     tasks.javadoc {
         options {
             this as StandardJavadocDocletOptions
-            
+
             // Fail on Javadoc lint errors.
             addBooleanOption("Xdoclint:all", true)
+            // This is a hack as we are not using Java15+.
+            // See https://stackoverflow.com/a/49544352/5611068.
+            addStringOption("Xwerror", "-quiet")
         }
     }
 
