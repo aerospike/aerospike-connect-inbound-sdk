@@ -174,6 +174,15 @@ allprojects {
         withSourcesJar()
     }
 
+    tasks.javadoc {
+        options {
+            this as StandardJavadocDocletOptions
+            
+            // Fail on Javadoc lint errors.
+            addBooleanOption("Xdoclint:all", true)
+        }
+    }
+
     val snykTokens: String by project
     val snykToken = snykTokens.split(",").map { it.trim() }.random()
 
