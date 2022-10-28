@@ -34,7 +34,7 @@ import java.util.Set;
 /**
  * A message from an external system like Kafka, Pulsar, etc processed by a
  * Aerospike inbound connector.
- * <br />
+ * <br>
  * The message is processed by the Aerospike inbound connector as specified in
  * its config and converted to a InboundMessage.
  */
