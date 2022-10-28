@@ -36,8 +36,6 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
-                    <testSource>1.8</testSource>
-                    <testTarget>1.8</testTarget>
                     <compilerArgs>
                         <arg>-Xlint:all</arg>
                         <arg>-Werror</arg>
@@ -57,7 +55,7 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.13.3</version>
+            <version>2.19.0</version>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>

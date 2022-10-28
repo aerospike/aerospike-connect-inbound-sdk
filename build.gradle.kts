@@ -65,8 +65,8 @@ allprojects {
     group = "com.aerospike"
 
     // Common dependency versions.
-    extra["aerospikeClientVersion"] = "5.1.2"
-    extra["jacksonVersion"] = "2.11.+"
+    extra["aerospikeClientVersion"] = "6.1.4"
+    extra["jacksonVersion"] = "2.13.4"
 
     dependencies {
         // Lombok for its @Generated annotation that jacoco ignores
@@ -81,15 +81,6 @@ allprojects {
 
         // Jackson annotation
         "api"("com.fasterxml.jackson.core:jackson-annotations:${project.extra["jacksonVersion"]}")
-
-        // Common test dependencies.
-        "testImplementation"(
-            "org.junit.jupiter:junit-jupiter-api:5.4.2"
-        )
-        "testImplementation"(
-            "org.junit.jupiter:junit-jupiter-params:5.4.2"
-        )
-        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.4.2")
     }
 
     val compileJava: JavaCompile by tasks
@@ -101,65 +92,11 @@ allprojects {
         compilerArgs.add("-Xlint:-processing")
     }
 
-    val compileTestJava: JavaCompile by tasks
-    compileTestJava.sourceCompatibility = "1.8"
-    compileTestJava.targetCompatibility = "1.8"
-    compileTestJava.options.apply {
-        compilerArgs.add("-Xlint:all")
-        compilerArgs.add("-Werror")
-        compilerArgs.add("-Xlint:-processing")
-    }
-
     project.extensions.configure(ReleaseExtension::class) {
         tagTemplate = "\$version"
     }
 
     tasks.getByName("afterReleaseBuild").dependsOn("publish")
-
-    /**
-     * Common configuration for test tasks.
-     */
-    fun Test.configureTestTask() {
-        val args = mutableListOf(
-                "-XX:MaxPermSize=512m",
-                "-Xmx4g",
-                "-Xms512m",
-                "-Djava.security.egd=file:/dev/./urandom",
-                "-Dproject.version=${project.version}"
-        )
-
-
-        project.properties.forEach { (property, value) ->
-            // Pass along project properties as System properties to the test.
-            args += "-D$property=$value"
-        }
-
-        // Pass all project versions
-        project.parent?.subprojects?.forEach {
-            args += "-D${it.name.replace("\\W".toRegex(), ".")}.version=${
-                it
-                        .version
-            }"
-        }
-
-        jvmArgs = args
-    }
-
-    /**
-     * Use Junit for running tests.
-     */
-    tasks.getByName<Test>("test") {
-        useJUnitPlatform {
-            // Exclude performance tests in normal runs.
-            excludeTags.add("performance")
-        }
-
-        configureTestTask()
-
-        testLogging {
-            events("passed", "skipped", "failed")
-        }
-    }
 
     publishing {
         repositories {
@@ -228,6 +165,7 @@ allprojects {
         sign(publishing.publications.getByName("mavenJava"))
     }
 
+    @Suppress("UnstableApiUsage")
     java {
         withJavadocJar()
         withSourcesJar()
