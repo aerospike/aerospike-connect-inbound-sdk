@@ -24,9 +24,9 @@ pipeline {
                     steps {
                         echo "Building.."
                         sh "./gradlew --no-daemon clean build"
-                        sh "mvn -f examples/jms clean install"
-                        sh "mvn -f examples/kafka clean install"
-                        sh "mvn -f examples/pulsar clean install"
+                        sh "mvn -f examples/jms clean install -Dsnyk.skip"
+                        sh "mvn -f examples/kafka clean install -Dsnyk.skip"
+                        sh "mvn -f examples/pulsar clean install -Dsnyk.skip"
                     }
                 }
 
@@ -34,6 +34,9 @@ pipeline {
                     steps {
                        echo "Running snyk scan.."
                        sh "./gradlew --no-daemon snyk-test"
+                       sh "mvn -f examples/jms test"
+                       sh "mvn -f examples/kafka test"
+                       sh "mvn -f examples/pulsar test"
                     }
                 }
             }

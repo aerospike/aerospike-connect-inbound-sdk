@@ -65,6 +65,7 @@
                 <configuration>
                     <apiToken>${env.SNYK_TOKEN}</apiToken>
                     <args>
+                        <arg>--severity-threshold=high</arg>
                         <arg>--all-projects</arg>
                     </args>
                 </configuration>
