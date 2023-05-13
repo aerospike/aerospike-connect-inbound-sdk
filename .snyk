@@ -3,4 +3,7 @@ ignore:
     - '*':
         reason: Library Exception allows non-free use of gnu-crypto
         expires: 2024-11-07T11:38:28.614Z
-
+  SNYK-JAVA-ORGJSON-5488379:
+    - '*':
+        reason: https://github.com/snyk/gradle-plugin/pull/24
+        expires: 2023-12-31T11:38:28.614Z
