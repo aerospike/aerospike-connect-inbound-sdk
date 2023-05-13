@@ -22,12 +22,7 @@ plugins {
     `java-gradle-plugin`
 }
 
-kotlinDslPluginOptions {
-    experimentalWarning.set(false)
-}
-
 repositories {
-    jcenter()
     maven {
         url = uri("https://plugins.gradle.org/m2/")
     }

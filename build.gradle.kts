@@ -24,7 +24,6 @@ buildscript {
         maven {
             url = uri("https://plugins.gradle.org/m2/")
         }
-        jcenter()
     }
     dependencies {
         classpath("net.researchgate:gradle-release:2.6.0")
@@ -46,7 +45,7 @@ allprojects {
     pluginManager.withPlugin("jacoco") {
         // If this project has the plugin applied, configure the tool version.
         jacoco {
-            toolVersion = "0.8.5"
+            toolVersion = "0.8.7"
         }
     }
 
@@ -62,19 +61,18 @@ allprojects {
     repositories {
         mavenLocal()
         mavenCentral()
-        jcenter()
     }
 
     group = "com.aerospike"
 
     // Common dependency versions.
     extra["aerospikeClientVersion"] = "6.1.4"
-    extra["jacksonVersion"] = "2.13.4"
+    extra["jacksonVersion"] = "2.15.0"
 
     dependencies {
         // Lombok for its @Generated annotation that jacoco ignores
-        "compileOnly"("org.projectlombok:lombok:1.18.12")
-        "annotationProcessor"("org.projectlombok:lombok:1.18.12")
+        "compileOnly"("org.projectlombok:lombok:1.18.26")
+        "annotationProcessor"("org.projectlombok:lombok:1.18.26")
 
         // JSR 305 for annotations
         "api"("com.google.code.findbugs:jsr305:3.0.2")
