@@ -78,6 +78,17 @@
             <groupId>com.aerospike</groupId>
             <artifactId>aerospike-connect-inbound-sdk</artifactId>
             <version>1.2.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.aerospike</groupId>
+                    <artifactId>aerospike-client</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.aerospike</groupId>
+            <artifactId>aerospike-client</artifactId>
+            <version>7.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

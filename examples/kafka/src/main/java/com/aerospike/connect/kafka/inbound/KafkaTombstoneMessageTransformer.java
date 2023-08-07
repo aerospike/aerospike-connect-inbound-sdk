@@ -20,6 +20,7 @@ package com.aerospike.connect.kafka.inbound;
 
 import com.aerospike.client.Bin;
 import com.aerospike.client.Key;
+import com.aerospike.client.Value;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.connect.inbound.InboundMessageTransformer;
 import com.aerospike.connect.inbound.model.InboundMessage;
@@ -46,7 +47,7 @@ public class KafkaTombstoneMessageTransformer
                     new Key("test", null, "jumbo_jet"), writePolicy);
         }
         return new AerospikePutOperation(new Key("test", null, "kevin"), writePolicy,
-                singletonList(new Bin("name",
-                        inboundMessage.getFields().get("name"))));
+                singletonList(new Bin("name", Value.get(
+                        inboundMessage.getFields().get("name")))));
     }
 }

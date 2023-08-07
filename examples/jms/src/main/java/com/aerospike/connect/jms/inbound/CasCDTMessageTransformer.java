@@ -110,20 +110,20 @@ public class CasCDTMessageTransformer implements
             cdrList.add(newCdr);
             bins.add(new Bin("cdrs", cdrList));
 
-            bins.add(new Bin("topicName",
-                    Objects.requireNonNull(inboundMessageTransformerConfig.getTransformerConfig()).get("topicName")));
+            bins.add(new Bin("topicName", Value.get(
+                    Objects.requireNonNull(inboundMessageTransformerConfig.getTransformerConfig()).get("topicName"))));
             // Add all config fields as a Bin
             bins.addAll(Objects.requireNonNull(inboundMessageTransformerConfig.getTransformerConfig())
                     .entrySet()
                     .stream()
-                    .map(e -> new Bin(e.getKey(), e.getValue()))
+                    .map(e -> new Bin(e.getKey(), Value.get(e.getValue())))
                     .collect(Collectors.toList())
             );
             // Add all JMS message fields as a Bin
             bins.addAll(input
                     .entrySet()
                     .stream()
-                    .map(e -> new Bin(e.getKey(), e.getValue()))
+                    .map(e -> new Bin(e.getKey(), Value.get(e.getValue())))
                     .collect(Collectors.toList())
             );
             // These error codes are sent in inboundMessage by Aerospike if you have configured them in
