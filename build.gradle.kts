@@ -66,13 +66,13 @@ allprojects {
     group = "com.aerospike"
 
     // Common dependency versions.
-    extra["aerospikeClientVersion"] = "6.1.4"
-    extra["jacksonVersion"] = "2.15.0"
+    extra["aerospikeClientVersion"] = "7.0.0"
+    extra["jacksonVersion"] = "2.15.2"
 
     dependencies {
         // Lombok for its @Generated annotation that jacoco ignores
-        "compileOnly"("org.projectlombok:lombok:1.18.26")
-        "annotationProcessor"("org.projectlombok:lombok:1.18.26")
+        "compileOnly"("org.projectlombok:lombok:1.18.28")
+        "annotationProcessor"("org.projectlombok:lombok:1.18.28")
 
         // JSR 305 for annotations
         "api"("com.google.code.findbugs:jsr305:3.0.2")
@@ -166,7 +166,6 @@ allprojects {
         sign(publishing.publications.getByName("mavenJava"))
     }
 
-    @Suppress("UnstableApiUsage")
     java {
         withJavadocJar()
         withSourcesJar()
