@@ -25,9 +25,6 @@ buildscript {
             url = uri("https://plugins.gradle.org/m2/")
         }
     }
-    dependencies {
-        classpath("net.researchgate:gradle-release:2.6.0")
-    }
 }
 
 plugins {
@@ -45,7 +42,7 @@ allprojects {
     pluginManager.withPlugin("jacoco") {
         // If this project has the plugin applied, configure the tool version.
         jacoco {
-            toolVersion = "0.8.7"
+            toolVersion = "0.8.10"
         }
     }
 
@@ -63,25 +60,31 @@ allprojects {
         mavenCentral()
     }
 
+    dependencies {
+        // TODO: Investigate. Snyk fails on older version of this dependency.
+        "dataFiles"("org.json:json:20231013")
+    }
+
     group = "com.aerospike"
 
     // Common dependency versions.
-    extra["aerospikeClientVersion"] = "7.0.0"
-    extra["jacksonVersion"] = "2.15.2"
+    extra["aerospikeClientVersion"] = "7.2.0"
+    extra["jacksonVersion"] = "2.15.3"
 
     dependencies {
         // Lombok for its @Generated annotation that jacoco ignores
-        "compileOnly"("org.projectlombok:lombok:1.18.28")
-        "annotationProcessor"("org.projectlombok:lombok:1.18.28")
+        val lombokVersion = "1.18.30"
+        "compileOnly"("org.projectlombok:lombok:$lombokVersion")
+        "annotationProcessor"("org.projectlombok:lombok:$lombokVersion")
 
         // JSR 305 for annotations
-        "api"("com.google.code.findbugs:jsr305:3.0.2")
+        "compileOnly"("com.google.code.findbugs:jsr305:3.0.2")
 
         // Aerospike Java Client
-        "api"("com.aerospike:aerospike-client:${project.extra["aerospikeClientVersion"]}")
+        "compileOnly"("com.aerospike:aerospike-client:${project.extra["aerospikeClientVersion"]}")
 
         // Jackson annotation
-        "api"("com.fasterxml.jackson.core:jackson-annotations:${project.extra["jacksonVersion"]}")
+        "compileOnly"("com.fasterxml.jackson.core:jackson-annotations:${project.extra["jacksonVersion"]}")
     }
 
     val compileJava: JavaCompile by tasks
@@ -139,7 +142,7 @@ allprojects {
                         developerConnection.set("scm:git@github.com:aerospike/aerospike-connect-inbound-sdk.git")
                         url.set("https://github.com/aerospike/aerospike-connect-inbound-sdk")
                     }
-                    developers{
+                    developers {
                         developer {
                             name.set("Aerospike")
                             email.set("developers@aerospike.com")
