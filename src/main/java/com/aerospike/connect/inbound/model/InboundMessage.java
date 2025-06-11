@@ -37,6 +37,9 @@ import java.util.Set;
  * <br>
  * The message is processed by the Aerospike inbound connector as specified in
  * its config and converted to a InboundMessage.
+ *
+ * @param <K> type of message key.
+ * @param <M> type of message.
  */
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -90,6 +93,13 @@ public class InboundMessage<K, M> {
      */
     @Nonnull
     private final Set<Integer> ignoreErrorCodes;
+
+    /**
+     * Default private constructor with comment to suppress javadoc warning.
+     */
+    private InboundMessage() {
+        throw new IllegalStateException("Cannot create InboundMessage");
+    }
 
     /**
      * Return the key of the message. Is present only if the external system

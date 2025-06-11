@@ -56,4 +56,11 @@ public class AerospikeDeleteOperation implements AerospikeSingleRecordOperation 
     @SuppressWarnings("FieldMayBeFinal")
     @Nonnull
     private Set<Integer> ignoreErrorCodes = Collections.emptySet();
+
+    /**
+     * Default private constructor with comment to suppress javadoc warning.
+     */
+    private AerospikeDeleteOperation() {
+        throw new IllegalStateException("Cannot create AerospikeDeleteOperation");
+    }
 }

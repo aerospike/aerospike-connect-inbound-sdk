@@ -94,6 +94,7 @@ allprojects {
         compilerArgs.add("-Xlint:all")
         compilerArgs.add("-Werror")
         compilerArgs.add("-Xlint:-processing")
+        compilerArgs.add("-Xlint:-options")
     }
 
     project.extensions.configure(ReleaseExtension::class) {
@@ -134,7 +135,7 @@ allprojects {
                     licenses {
                         license {
                             name.set("The Apache License, Version 2.0")
-                            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                            url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
                         }
                     }
                     scm {
@@ -189,7 +190,7 @@ allprojects {
     val snykTokens: String by project
     val snykToken = snykTokens.split(",").map { it.trim() }.random()
 
-    tasks.create<Exec>("setup-snyk") {
+    tasks.register("setup-snyk",Exec::class.java) {
         commandLine("${project.rootDir}/snyk", "auth", snykToken)
     }
     tasks.getByName("snyk-check-binary").finalizedBy("setup-snyk")

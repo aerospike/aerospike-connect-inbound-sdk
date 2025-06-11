@@ -31,14 +31,17 @@ import java.util.Set;
  */
 public interface AerospikeSingleRecordOperation extends AerospikeRecordOperation {
     /**
-     * @return Aerospike record Key
+     * Get the Aerospike record key.
+     *
+     * @return {@link Key}
      */
     @Nonnull
     Key getKey();
 
     /**
-     * @return The write policy to use for this operation. Defaults to null implying the
-     * default write policy.
+     * The write policy to use for this operation. Defaults to null implying the default write policy.
+     *
+     * @return {@link WritePolicy}.
      */
     @Nullable
     WritePolicy getWritePolicy();

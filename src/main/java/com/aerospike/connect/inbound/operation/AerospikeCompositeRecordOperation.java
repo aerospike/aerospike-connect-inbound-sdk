@@ -40,4 +40,10 @@ public class AerospikeCompositeRecordOperation implements AerospikeRecordOperati
      */
     private final List<AerospikeSingleRecordOperation> operations;
 
+    /**
+     * Default private constructor with comment to suppress javadoc warning.
+     */
+    private AerospikeCompositeRecordOperation() {
+        throw new IllegalStateException("Cannot create AerospikeCompositeRecordOperation");
+    }
 }
