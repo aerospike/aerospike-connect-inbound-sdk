@@ -22,4 +22,10 @@ package com.aerospike.connect.inbound.operation;
  * The class to be used for cases when inbound record from the external system should be skipped.
  */
 public class AerospikeSkipRecordOperation implements AerospikeRecordOperation {
+    /**
+     * Default private constructor with comment to suppress javadoc warning.
+     */
+    private AerospikeSkipRecordOperation() {
+        throw new IllegalStateException("Cannot create AerospikeSkipRecordOperation");
+    }
 }

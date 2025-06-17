@@ -63,4 +63,11 @@ public class AerospikePutOperation implements AerospikeSingleRecordOperation {
     @SuppressWarnings("FieldMayBeFinal")
     @Nonnull
     private Set<Integer> ignoreErrorCodes = Collections.emptySet();
+
+    /**
+     * Default private constructor with comment to suppress javadoc warning.
+     */
+    private AerospikePutOperation() {
+        throw new IllegalStateException("Cannot create AerospikePutOperation");
+    }
 }
