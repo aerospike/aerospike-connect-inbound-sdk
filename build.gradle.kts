@@ -42,7 +42,7 @@ allprojects {
     pluginManager.withPlugin("jacoco") {
         // If this project has the plugin applied, configure the tool version.
         jacoco {
-            toolVersion = "0.8.10"
+            toolVersion = "0.8.13"
         }
     }
 
@@ -60,20 +60,15 @@ allprojects {
         mavenCentral()
     }
 
-    dependencies {
-        // TODO: Investigate. Snyk fails on older version of this dependency.
-        "dataFiles"("org.json:json:20231013")
-    }
-
     group = "com.aerospike"
 
     // Common dependency versions.
-    extra["aerospikeClientVersion"] = "7.2.0"
-    extra["jacksonVersion"] = "2.15.3"
+    extra["aerospikeClientVersion"] = "9.0.5"
+    extra["jacksonVersion"] = "2.19.1"
 
     dependencies {
         // Lombok for its @Generated annotation that jacoco ignores
-        val lombokVersion = "1.18.30"
+        val lombokVersion = "1.18.38"
         "compileOnly"("org.projectlombok:lombok:$lombokVersion")
         "annotationProcessor"("org.projectlombok:lombok:$lombokVersion")
 
@@ -81,7 +76,7 @@ allprojects {
         "compileOnly"("com.google.code.findbugs:jsr305:3.0.2")
 
         // Aerospike Java Client
-        "compileOnly"("com.aerospike:aerospike-client:${project.extra["aerospikeClientVersion"]}")
+        "compileOnly"("com.aerospike:aerospike-client-jdk8:${project.extra["aerospikeClientVersion"]}")
 
         // Jackson annotation
         "compileOnly"("com.fasterxml.jackson.core:jackson-annotations:${project.extra["jacksonVersion"]}")
@@ -146,7 +141,7 @@ allprojects {
                     developers {
                         developer {
                             name.set("Aerospike")
-                            email.set("developers@aerospike.com")
+                            email.set("helpdesk@aerospike.com")
                             organization.set("Aerospike")
                             url.set("https://www.aerospike.com/")
                         }
