@@ -40,6 +40,8 @@
                         <arg>-Xlint:all</arg>
                         <arg>-Werror</arg>
                         <arg>-Xlint:-processing</arg>
+                        <!--[WARNING] source value 8 is obsolete and will be removed in a future release-->
+                        <arg>-Xlint:-options</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>
