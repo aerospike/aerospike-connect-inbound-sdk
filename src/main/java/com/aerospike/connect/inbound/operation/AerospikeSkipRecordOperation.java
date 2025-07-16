@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2012-2021 Aerospike, Inc.
+ *  Copyright 2012-2025 Aerospike, Inc.
  *
  *  Portions may be licensed to Aerospike, Inc. under one or more contributor
  *  license agreements WHICH ARE COMPATIBLE WITH THE APACHE LICENSE, VERSION 2.0.
@@ -23,9 +23,8 @@ package com.aerospike.connect.inbound.operation;
  */
 public class AerospikeSkipRecordOperation implements AerospikeRecordOperation {
     /**
-     * Default private constructor with comment to suppress javadoc warning.
+     * Default constructor with comment to suppress javadoc warning.
      */
-    private AerospikeSkipRecordOperation() {
-        throw new IllegalStateException("Cannot create AerospikeSkipRecordOperation");
+    public AerospikeSkipRecordOperation() {
     }
 }

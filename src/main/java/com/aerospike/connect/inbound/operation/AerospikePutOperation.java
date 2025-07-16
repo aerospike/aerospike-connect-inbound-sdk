@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2012-2021 Aerospike, Inc.
+ *  Copyright 2012-2025 Aerospike, Inc.
  *
  *  Portions may be licensed to Aerospike, Inc. under one or more contributor
  *  license agreements WHICH ARE COMPATIBLE WITH THE APACHE LICENSE, VERSION 2.0.
@@ -21,16 +21,15 @@ package com.aerospike.connect.inbound.operation;
 import com.aerospike.client.Bin;
 import com.aerospike.client.Key;
 import com.aerospike.client.policy.WritePolicy;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Represents a standard Aerospike KVS put operation.
@@ -65,9 +64,9 @@ public class AerospikePutOperation implements AerospikeSingleRecordOperation {
     private Set<Integer> ignoreErrorCodes = Collections.emptySet();
 
     /**
-     * Default private constructor with comment to suppress javadoc warning.
+     * Default constructor with comment to suppress javadoc warning.
      */
-    private AerospikePutOperation() {
+    public AerospikePutOperation() {
         throw new IllegalStateException("Cannot create AerospikePutOperation");
     }
 }
