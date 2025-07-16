@@ -100,13 +100,26 @@ allprojects {
 
     publishing {
         repositories {
+            val connectSnapshotsRepo: String by project
+            val connectSnapshotsRepoUser: String by project
+            val connectSnapshotsRepoPassword: String by project
+            val projectVersion = project.version
+
             maven {
                 val releaseRepo = URI("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-                val snapshotRepo = URI("https://oss.sonatype.org/content/repositories/snapshots/")
-                url = if (!isSnapshotVersion(project.version)) releaseRepo else snapshotRepo
+                val snapshotRepo = URI(connectSnapshotsRepo)
+                url = if (!isSnapshotVersion(projectVersion)) releaseRepo else snapshotRepo
                 credentials {
-                    username = project.properties["ossrhUsername"] as String
-                    password = project.properties["ossrhPassword"] as String
+                    username = if (!isSnapshotVersion(projectVersion)) {
+                        project.properties["ossrhUsername"] as? String
+                    } else {
+                        connectSnapshotsRepoUser
+                    }
+                    password = if (!isSnapshotVersion(projectVersion)) {
+                        project.properties["ossrhPassword"] as? String
+                    } else {
+                        connectSnapshotsRepoPassword
+                    }
                 }
             }
         }

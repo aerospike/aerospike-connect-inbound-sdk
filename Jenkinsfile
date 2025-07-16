@@ -39,6 +39,13 @@ pipeline {
                        sh "mvn -f examples/pulsar test"
                     }
                 }
+
+                stage("Upload") {
+                    steps {
+                        echo "Uploading archives.."
+                        sh "./gradlew --no-daemon publish"
+                    }
+                }
             }
         }
     }
