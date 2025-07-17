@@ -30,13 +30,25 @@ pipeline {
                     }
                 }
 
-                stage("Vulnerability scanning") {
-                    steps {
-                       echo "Running snyk scan.."
-                       sh "./gradlew --no-daemon snyk-test"
-                       sh "mvn -f examples/jms test"
-                       sh "mvn -f examples/kafka test"
-                       sh "mvn -f examples/pulsar test"
+                stage("Checks") {
+                    parallel {
+                        stage("Vulnerability scanning") {
+                            steps {
+                               echo "Running snyk scan.."
+                               sh "./gradlew --no-daemon snyk-test"
+                               sh "mvn -f examples/jms test"
+                               sh "mvn -f examples/kafka test"
+                               sh "mvn -f examples/pulsar test"
+                            }
+                        }
+                        stage("Tests") {
+                            steps {
+                                script {
+                                    echo "Running tests.."
+                                    sh "./gradlew --no-daemon test"
+                                }
+                            }
+                        }
                     }
                 }
 

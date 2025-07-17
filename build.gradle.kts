@@ -69,17 +69,22 @@ allprojects {
     dependencies {
         // Lombok for its @Generated annotation that jacoco ignores
         val lombokVersion = "1.18.38"
-        "compileOnly"("org.projectlombok:lombok:$lombokVersion")
-        "annotationProcessor"("org.projectlombok:lombok:$lombokVersion")
+        compileOnly("org.projectlombok:lombok:$lombokVersion")
+        annotationProcessor("org.projectlombok:lombok:$lombokVersion")
 
         // JSR 305 for annotations
-        "compileOnly"("com.google.code.findbugs:jsr305:3.0.2")
+        compileOnly("com.google.code.findbugs:jsr305:3.0.2")
 
         // Aerospike Java Client
-        "compileOnly"("com.aerospike:aerospike-client-jdk8:${project.extra["aerospikeClientVersion"]}")
+        compileOnly("com.aerospike:aerospike-client-jdk8:${project.extra["aerospikeClientVersion"]}")
 
         // Jackson annotation
-        "compileOnly"("com.fasterxml.jackson.core:jackson-annotations:${project.extra["jacksonVersion"]}")
+        compileOnly("com.fasterxml.jackson.core:jackson-annotations:${project.extra["jacksonVersion"]}")
+
+        // Test dependencies
+        testImplementation("com.aerospike:aerospike-client-jdk8:${project.extra["aerospikeClientVersion"]}")
+        testImplementation("org.junit.jupiter:junit-jupiter:5.13.3")
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     }
 
     val compileJava: JavaCompile by tasks
@@ -97,6 +102,16 @@ allprojects {
     }
 
     tasks.getByName("afterReleaseBuild").dependsOn("publish")
+
+    tasks.named<Test>("test") {
+        useJUnitPlatform()
+
+        maxHeapSize = "1G"
+
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
+    }
 
     publishing {
         repositories {
