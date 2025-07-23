@@ -88,12 +88,13 @@ allprojects {
     }
 
     val compileJava: JavaCompile by tasks
-    compileJava.sourceCompatibility = JavaVersion.VERSION_11.majorVersion
-    compileJava.targetCompatibility = JavaVersion.VERSION_11.majorVersion
+    compileJava.sourceCompatibility = "1.8"
+    compileJava.targetCompatibility = "1.8"
     compileJava.options.apply {
         compilerArgs.add("-Xlint:all")
         compilerArgs.add("-Werror")
         compilerArgs.add("-Xlint:-processing")
+        compilerArgs.add("-Xlint:-options")
     }
 
     project.extensions.configure(ReleaseExtension::class) {
