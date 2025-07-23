@@ -64,7 +64,7 @@ allprojects {
 
     // Common dependency versions.
     extra["aerospikeClientVersion"] = "9.0.5"
-    extra["jacksonVersion"] = "2.19.1"
+    extra["jacksonVersion"] = "2.17.3"
 
     dependencies {
         // Lombok for its @Generated annotation that jacoco ignores
