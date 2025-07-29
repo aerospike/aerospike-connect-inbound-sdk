@@ -121,7 +121,8 @@ allprojects {
             val projectVersion = project.version
 
             maven {
-                val releaseRepo = URI("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+                val releaseRepo =
+                    URI("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
                 val snapshotRepo = URI(connectSnapshotsRepo)
                 url = if (!isSnapshotVersion(projectVersion)) releaseRepo else snapshotRepo
                 credentials {
