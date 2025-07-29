@@ -3,3 +3,5 @@ ignore:
     - '*':
         reason: Library Exception allows non-free use of gnu-crypto
         expires: 2025-12-31T23:59:59.614Z
+exclude:
+  - ./examples
