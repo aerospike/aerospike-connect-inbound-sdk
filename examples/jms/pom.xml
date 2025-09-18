@@ -2,7 +2,7 @@
 
 <!--
   ~
-  ~  Copyright 2012-2020 Aerospike, Inc.
+  ~  Copyright 2012-2025 Aerospike, Inc.
   ~
   ~  Portions may be licensed to Aerospike, Inc. under one or more contributor
   ~  license agreements WHICH ARE COMPATIBLE WITH THE APACHE LICENSE, VERSION 2.0.
@@ -32,7 +32,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.14.0</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -40,34 +40,9 @@
                         <arg>-Xlint:all</arg>
                         <arg>-Werror</arg>
                         <arg>-Xlint:-processing</arg>
+                        <!--[WARNING] source value 8 is obsolete and will be removed in a future release-->
+                        <arg>-Xlint:-options</arg>
                     </compilerArgs>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>io.snyk</groupId>
-                <artifactId>snyk-maven-plugin</artifactId>
-                <version>2.0.0</version>
-                <inherited>false</inherited>
-                <executions>
-                    <execution>
-                        <id>snyk-test</id>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>snyk-monitor</id>
-                        <goals>
-                            <goal>monitor</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <apiToken>${env.SNYK_TOKEN}</apiToken>
-                    <args>
-                        <arg>--severity-threshold=high</arg>
-                        <arg>--all-projects</arg>
-                    </args>
                 </configuration>
             </plugin>
         </plugins>
@@ -81,8 +56,8 @@
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.22.0</version>
+            <artifactId>log4j-slf4j2-impl</artifactId>
+            <version>2.25.1</version>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>

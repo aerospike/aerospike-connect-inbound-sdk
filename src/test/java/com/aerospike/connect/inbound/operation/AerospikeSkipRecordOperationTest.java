@@ -18,13 +18,16 @@
 
 package com.aerospike.connect.inbound.operation;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 /**
- * The class to be used for cases when inbound record from the external system should be skipped.
+ * Unit tests for {@link AerospikeSkipRecordOperation}.
  */
-public class AerospikeSkipRecordOperation implements AerospikeRecordOperation {
-    /**
-     * Default constructor with comment to suppress javadoc warning.
-     */
-    public AerospikeSkipRecordOperation() {
+class AerospikeSkipRecordOperationTest {
+    @Test
+    void testSuccessOnDefaultConstructor() {
+        assertDoesNotThrow(AerospikeSkipRecordOperation::new);
     }
 }

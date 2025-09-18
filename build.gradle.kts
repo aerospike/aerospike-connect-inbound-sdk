@@ -42,7 +42,7 @@ allprojects {
     pluginManager.withPlugin("jacoco") {
         // If this project has the plugin applied, configure the tool version.
         jacoco {
-            toolVersion = "0.8.10"
+            toolVersion = "0.8.13"
         }
     }
 
@@ -60,31 +60,31 @@ allprojects {
         mavenCentral()
     }
 
-    dependencies {
-        // TODO: Investigate. Snyk fails on older version of this dependency.
-        "dataFiles"("org.json:json:20231013")
-    }
-
     group = "com.aerospike"
 
     // Common dependency versions.
-    extra["aerospikeClientVersion"] = "7.2.0"
-    extra["jacksonVersion"] = "2.15.3"
+    extra["aerospikeClientVersion"] = "9.2.0"
+    extra["jacksonVersion"] = "2.18.4"
 
     dependencies {
         // Lombok for its @Generated annotation that jacoco ignores
-        val lombokVersion = "1.18.30"
-        "compileOnly"("org.projectlombok:lombok:$lombokVersion")
-        "annotationProcessor"("org.projectlombok:lombok:$lombokVersion")
+        val lombokVersion = "1.18.38"
+        compileOnly("org.projectlombok:lombok:$lombokVersion")
+        annotationProcessor("org.projectlombok:lombok:$lombokVersion")
 
         // JSR 305 for annotations
-        "compileOnly"("com.google.code.findbugs:jsr305:3.0.2")
+        compileOnly("com.google.code.findbugs:jsr305:3.0.2")
 
         // Aerospike Java Client
-        "compileOnly"("com.aerospike:aerospike-client:${project.extra["aerospikeClientVersion"]}")
+        compileOnly("com.aerospike:aerospike-client-jdk8:${project.extra["aerospikeClientVersion"]}")
 
         // Jackson annotation
-        "compileOnly"("com.fasterxml.jackson.core:jackson-annotations:${project.extra["jacksonVersion"]}")
+        compileOnly("com.fasterxml.jackson.core:jackson-annotations:${project.extra["jacksonVersion"]}")
+
+        // Test dependencies
+        testImplementation("com.aerospike:aerospike-client-jdk8:${project.extra["aerospikeClientVersion"]}")
+        testImplementation("org.junit.jupiter:junit-jupiter:5.13.4")
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     }
 
     val compileJava: JavaCompile by tasks
@@ -103,15 +103,39 @@ allprojects {
 
     tasks.getByName("afterReleaseBuild").dependsOn("publish")
 
+    tasks.named<Test>("test") {
+        useJUnitPlatform()
+
+        maxHeapSize = "1G"
+
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
+    }
+
     publishing {
         repositories {
+            val connectSnapshotsRepo: String by project
+            val connectSnapshotsRepoUser: String by project
+            val connectSnapshotsRepoPassword: String by project
+            val projectVersion = project.version
+
             maven {
-                val releaseRepo = URI("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-                val snapshotRepo = URI("https://oss.sonatype.org/content/repositories/snapshots/")
-                url = if (!isSnapshotVersion(project.version)) releaseRepo else snapshotRepo
+                val releaseRepo =
+                    URI("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
+                val snapshotRepo = URI(connectSnapshotsRepo)
+                url = if (!isSnapshotVersion(projectVersion)) releaseRepo else snapshotRepo
                 credentials {
-                    username = project.properties["ossrhUsername"] as String
-                    password = project.properties["ossrhPassword"] as String
+                    username = if (!isSnapshotVersion(projectVersion)) {
+                        project.properties["ossrhUsername"] as? String
+                    } else {
+                        connectSnapshotsRepoUser
+                    }
+                    password = if (!isSnapshotVersion(projectVersion)) {
+                        project.properties["ossrhPassword"] as? String
+                    } else {
+                        connectSnapshotsRepoPassword
+                    }
                 }
             }
         }
@@ -146,7 +170,7 @@ allprojects {
                     developers {
                         developer {
                             name.set("Aerospike")
-                            email.set("developers@aerospike.com")
+                            email.set("helpdesk@aerospike.com")
                             organization.set("Aerospike")
                             url.set("https://www.aerospike.com/")
                         }

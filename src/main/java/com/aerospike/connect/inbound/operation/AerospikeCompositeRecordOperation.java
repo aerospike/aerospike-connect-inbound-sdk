@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2012-2021 Aerospike, Inc.
+ *  Copyright 2012-2025 Aerospike, Inc.
  *
  *  Portions may be licensed to Aerospike, Inc. under one or more contributor
  *  license agreements WHICH ARE COMPATIBLE WITH THE APACHE LICENSE, VERSION 2.0.
@@ -18,10 +18,9 @@
 
 package com.aerospike.connect.inbound.operation;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.util.List;
 
 /**
  * A class to perform multiple {@link AerospikeSingleRecordOperation}s.
@@ -41,9 +40,9 @@ public class AerospikeCompositeRecordOperation implements AerospikeRecordOperati
     private final List<AerospikeSingleRecordOperation> operations;
 
     /**
-     * Default private constructor with comment to suppress javadoc warning.
+     * Default constructor with comment to suppress javadoc warning.
      */
-    private AerospikeCompositeRecordOperation() {
+    public AerospikeCompositeRecordOperation() {
         throw new IllegalStateException("Cannot create AerospikeCompositeRecordOperation");
     }
 }
