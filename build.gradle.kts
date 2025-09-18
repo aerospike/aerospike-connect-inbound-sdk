@@ -63,7 +63,7 @@ allprojects {
     group = "com.aerospike"
 
     // Common dependency versions.
-    extra["aerospikeClientVersion"] = "9.0.5"
+    extra["aerospikeClientVersion"] = "9.2.0"
     extra["jacksonVersion"] = "2.18.4"
 
     dependencies {
@@ -83,7 +83,7 @@ allprojects {
 
         // Test dependencies
         testImplementation("com.aerospike:aerospike-client-jdk8:${project.extra["aerospikeClientVersion"]}")
-        testImplementation("org.junit.jupiter:junit-jupiter:5.13.3")
+        testImplementation("org.junit.jupiter:junit-jupiter:5.13.4")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     }
 
