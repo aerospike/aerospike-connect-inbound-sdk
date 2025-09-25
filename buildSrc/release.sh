@@ -77,4 +77,4 @@ echo "--------------------------------------------------------------------------
 ./gradlew --stacktrace --no-daemon ":snyk-test"
 
 # Run the release task
-../gradlew --stacktrace --no-daemon release publishGithubRelease -Prelease.useAutomaticVersion=true -Prelease.releaseVersion=$version -PreleaseNotesFile="$releaseNotesFile"
+./gradlew --stacktrace --no-daemon release publishGithubRelease -Prelease.useAutomaticVersion=true -Prelease.releaseVersion=$version -PreleaseNotesFile="$releaseNotesFile"
