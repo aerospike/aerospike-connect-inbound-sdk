@@ -16,24 +16,20 @@
  *  the License.
  */
 
-plugins {
-    `kotlin-dsl`
-    groovy
-    `java-gradle-plugin`
-}
+package com.aerospike.connect
 
-repositories {
-    maven {
-        url = uri("https://plugins.gradle.org/m2/")
+import org.gradle.api.Project
+import org.gradle.api.tasks.testing.Test
+import org.gradle.kotlin.dsl.named
+
+fun Project.setupTests() {
+    tasks.named<Test>("test") {
+        useJUnitPlatform()
+
+        maxHeapSize = "1G"
+
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
     }
-}
-
-dependencies {
-    api("net.researchgate:gradle-release:3.1.0")
-    api("io.snyk.gradle.plugin.snykplugin:io.snyk.gradle.plugin.snykplugin.gradle.plugin:0.7.0")
-    api("com.github.breadmoirai:github-release:2.5.2")
-
-    val jacksonVersion = "2.18.4"
-    api("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
-    api("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
 }

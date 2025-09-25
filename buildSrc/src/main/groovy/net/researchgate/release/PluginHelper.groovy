@@ -40,7 +40,7 @@ class PluginHelper {
      * The logger is taken from the {@link Project} instance if it's initialized already
      * or from SLF4J {@link LoggerFactory} if it's not.
      *
-     * @return SLF4J{@link Logger} instance
+     * @return SLF4J {@link Logger} instance
      */
     Logger getLog() { project?.logger ?: LoggerFactory.getLogger(this.class) }
 
@@ -77,7 +77,7 @@ class PluginHelper {
                 project.version = getReleaseVersion('1.0.0')
             }
 
-            if (!useAutomaticVersion() && promptYesOrNo('Do you want to use SNAPSHOT versions inbetween releases')) {
+            if (!useAutomaticVersion() && promptYesOrNo('Do you want to use SNAPSHOT versions in between releases')) {
                 attributes.usesSnapshot = true
             }
 
@@ -121,20 +121,12 @@ class PluginHelper {
     }
 
     String tagName() {
-        def tagName
-        if (extension.tagTemplate) {
-            def engine = new SimpleTemplateEngine()
-            def binding = [
-                    "version": project.version,
-                    "name"   : project.name
-            ]
-            tagName = engine.createTemplate(extension.tagTemplate).make(binding).toString()
-        } else {
-            // Backward compatible remove in version 3.0
-            String prefix = extension.tagPrefix ? "${extension.tagPrefix}-" : (extension.includeProjectNameInTag ? "${project.name}-" : "")
-            tagName = "${prefix}${project.version}"
-        }
-
+        def engine = new SimpleTemplateEngine()
+        def binding = [
+                "version": project.version,
+                "name"   : project.name
+        ]
+        def tagName = engine.createTemplate(extension.tagTemplate.get()).make(binding).toString()
         // Aerospike change start.
         // Remove snapshot prefix from the tagname.
         tagName = tagName.replaceAll("-SNAPSHOT", "")
@@ -177,7 +169,7 @@ class PluginHelper {
             project.version = newVersion
             attributes.versionModified = true
             project.subprojects?.each { it.version = newVersion }
-            List<String> versionProperties = extension.versionProperties + 'version'
+            List<String> versionProperties = extension.versionProperties.get() + 'version'
             versionProperties.each { writeVersion(findPropertiesFile(), it, project.version) }
         }
     }
@@ -203,7 +195,7 @@ class PluginHelper {
         String defaultStr = defaultValue ? 'Y' : 'n'
         String consoleVal = readLine("${message} (Y|n)", defaultStr)
         if (consoleVal) {
-            return consoleVal.toLowerCase().startsWith('y')
+            return consoleVal.lowercase().startsWith('y')
         }
 
         defaultValue
