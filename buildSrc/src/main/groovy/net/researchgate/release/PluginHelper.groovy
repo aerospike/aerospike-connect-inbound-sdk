@@ -1,11 +1,19 @@
 /*
- * This file is part of the gradle-release plugin.
  *
- * (c) Eric Berry
- * (c) ResearchGate GmbH
+ *  Copyright 2012-2025 Aerospike, Inc.
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ *  Portions may be licensed to Aerospike, Inc. under one or more contributor
+ *  license agreements WHICH ARE COMPATIBLE WITH THE APACHE LICENSE, VERSION 2.0.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ *  use this file except in compliance with the License. You may obtain a copy of
+ *  the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ *  License for the specific language governing permissions and limitations under
+ *  the License.
  */
 
 /*
@@ -40,7 +48,7 @@ class PluginHelper {
      * The logger is taken from the {@link Project} instance if it's initialized already
      * or from SLF4J {@link LoggerFactory} if it's not.
      *
-     * @return SLF4J{@link Logger} instance
+     * @return SLF4J {@link Logger} instance
      */
     Logger getLog() { project?.logger ?: LoggerFactory.getLogger(this.class) }
 
@@ -77,7 +85,7 @@ class PluginHelper {
                 project.version = getReleaseVersion('1.0.0')
             }
 
-            if (!useAutomaticVersion() && promptYesOrNo('Do you want to use SNAPSHOT versions inbetween releases')) {
+            if (!useAutomaticVersion() && promptYesOrNo('Do you want to use SNAPSHOT versions in between releases')) {
                 attributes.usesSnapshot = true
             }
 
@@ -121,20 +129,12 @@ class PluginHelper {
     }
 
     String tagName() {
-        def tagName
-        if (extension.tagTemplate) {
-            def engine = new SimpleTemplateEngine()
-            def binding = [
-                    "version": project.version,
-                    "name"   : project.name
-            ]
-            tagName = engine.createTemplate(extension.tagTemplate).make(binding).toString()
-        } else {
-            // Backward compatible remove in version 3.0
-            String prefix = extension.tagPrefix ? "${extension.tagPrefix}-" : (extension.includeProjectNameInTag ? "${project.name}-" : "")
-            tagName = "${prefix}${project.version}"
-        }
-
+        def engine = new SimpleTemplateEngine()
+        def binding = [
+                "version": project.version,
+                "name"   : project.name
+        ]
+        def tagName = engine.createTemplate(extension.tagTemplate.get()).make(binding).toString()
         // Aerospike change start.
         // Remove snapshot prefix from the tagname.
         tagName = tagName.replaceAll("-SNAPSHOT", "")
@@ -177,7 +177,7 @@ class PluginHelper {
             project.version = newVersion
             attributes.versionModified = true
             project.subprojects?.each { it.version = newVersion }
-            List<String> versionProperties = extension.versionProperties + 'version'
+            List<String> versionProperties = extension.versionProperties.get() + 'version'
             versionProperties.each { writeVersion(findPropertiesFile(), it, project.version) }
         }
     }
@@ -203,7 +203,7 @@ class PluginHelper {
         String defaultStr = defaultValue ? 'Y' : 'n'
         String consoleVal = readLine("${message} (Y|n)", defaultStr)
         if (consoleVal) {
-            return consoleVal.toLowerCase().startsWith('y')
+            return consoleVal.lowercase().startsWith('y')
         }
 
         defaultValue
