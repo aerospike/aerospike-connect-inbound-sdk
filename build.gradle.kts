@@ -77,10 +77,10 @@ allprojects {
         annotationProcessor("org.projectlombok:lombok:$lombokVersion")
 
         // JSR 305 for annotations
-        compileOnly("com.google.code.findbugs:jsr305:3.0.2")
+        "api"("com.google.code.findbugs:jsr305:3.0.2")
 
         // Aerospike Java Client
-        compileOnly("com.aerospike:aerospike-client-jdk8:${project.extra["aerospikeClientVersion"]}")
+        "api"("com.aerospike:aerospike-client-jdk8:${project.extra["aerospikeClientVersion"]}")
 
         // Jackson annotation
         compileOnly("com.fasterxml.jackson.core:jackson-annotations:${project.extra["jacksonVersion"]}")
