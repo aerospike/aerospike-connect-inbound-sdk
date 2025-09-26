@@ -83,7 +83,7 @@ allprojects {
         "api"("com.aerospike:aerospike-client-jdk8:${project.extra["aerospikeClientVersion"]}")
 
         // Jackson annotation
-        compileOnly("com.fasterxml.jackson.core:jackson-annotations:${project.extra["jacksonVersion"]}")
+        "api"("com.fasterxml.jackson.core:jackson-annotations:${project.extra["jacksonVersion"]}")
 
         // Test dependencies
         testImplementation("com.aerospike:aerospike-client-jdk8:${project.extra["aerospikeClientVersion"]}")
