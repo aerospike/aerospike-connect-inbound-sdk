@@ -60,7 +60,7 @@ fun Project.createGithubPublishTasks() {
             GithubReleaseConfiguration.toFile(
                 githubReleaseConfigurationFile,
                 GithubReleaseConfiguration(
-                    tagName = "${project.name}-$releaseVersion",
+                    tagName = "$releaseVersion",
                     releaseName = releaseName,
                     body = body
                 )
