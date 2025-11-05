@@ -24,9 +24,9 @@ pipeline {
                     steps {
                         echo "Building.."
                         sh "./gradlew --no-daemon clean build"
-                        sh "mvn -f examples/jms -U clean install"
-                        sh "mvn -f examples/kafka clean install"
-                        sh "mvn -f examples/pulsar clean install"
+                        sh "mvn -B -Dstyle.color=neve -f examples/jms -U clean install"
+                        sh "mvn -B -Dstyle.color=neve -f examples/kafka clean install"
+                        sh "mvn -B -Dstyle.color=neve -f examples/pulsar clean install"
                     }
                 }
 
