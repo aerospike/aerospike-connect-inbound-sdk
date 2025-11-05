@@ -33,14 +33,11 @@ import org.gradle.kotlin.dsl.provideDelegate
  */
 fun Project.setupJavaBuild() {
     val compileJava: JavaCompile by tasks
-    compileJava.sourceCompatibility = "1.8"
-    compileJava.targetCompatibility = "1.8"
+    compileJava.sourceCompatibility = "11"
+    compileJava.targetCompatibility = "11"
     compileJava.options.apply {
         compilerArgs.add("-Xlint:all")
         compilerArgs.add("-Werror")
-        // Suppress warning: [options] source value 8 is obsolete and will be
-        // removed in a future release.
-        compilerArgs.add("-Xlint:-options")
         compilerArgs.add("-Xlint:-processing")
     }
 
