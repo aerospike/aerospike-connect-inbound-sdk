@@ -30,6 +30,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  * Represents a standard Aerospike KVS put operation.
@@ -38,6 +39,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @Getter
+@ToString
 public class AerospikePutOperation implements AerospikeSingleRecordOperation {
     /**
      * @see AerospikeSingleRecordOperation#getKey()

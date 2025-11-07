@@ -28,6 +28,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  * Represents a standard Aerospike KVS delete operation.
@@ -36,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @Getter
+@ToString
 public class AerospikeDeleteOperation implements AerospikeSingleRecordOperation {
     /**
      * @see AerospikeSingleRecordOperation#getKey()

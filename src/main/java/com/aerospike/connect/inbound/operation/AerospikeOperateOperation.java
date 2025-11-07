@@ -30,6 +30,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  * Represents an Aerospike single record transaction specified as a list of
@@ -39,6 +40,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @Getter
+@ToString
 public class AerospikeOperateOperation implements AerospikeSingleRecordOperation {
     /**
      * @see AerospikeSingleRecordOperation#getKey()
