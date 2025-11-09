@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2012-2021 Aerospike, Inc.
+ *  Copyright 2012-2025 Aerospike, Inc.
  *
  *  Portions may be licensed to Aerospike, Inc. under one or more contributor
  *  license agreements WHICH ARE COMPATIBLE WITH THE APACHE LICENSE, VERSION 2.0.
@@ -22,12 +22,12 @@ import com.aerospike.connect.inbound.InboundMessageTransformer;
 import com.aerospike.connect.inbound.operation.AerospikeCompositeRecordOperation;
 import com.aerospike.connect.inbound.operation.AerospikeRecordOperation;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Map;
+import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-
-import javax.annotation.Nullable;
-import java.util.Map;
+import lombok.ToString;
 
 /**
  * Config used by the message transformer for the Inbound messages.
@@ -35,6 +35,7 @@ import java.util.Map;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Getter
+@ToString
 public class InboundMessageTransformerConfig {
     /**
      * Class to be used for converting inbound messages to the {@link AerospikeRecordOperation}.

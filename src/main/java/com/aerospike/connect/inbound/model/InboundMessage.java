@@ -29,6 +29,7 @@ import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * A message from an external system like Kafka, Pulsar, etc processed by a
@@ -43,6 +44,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Getter
+@ToString
 public class InboundMessage<K, M> {
     /**
      * The key of the message. Is present only if the external system associates
