@@ -21,7 +21,7 @@ Add a dependency to com.aerospike:aerospike-connect-inbound-sdk.
 <dependency>
     <groupId>com.aerospike</groupId>
     <artifactId>aerospike-connect-inbound-sdk</artifactId>
-    <version>1.3.2</version>
+    <version>1.4.0</version>
 </dependency>
 ```
 
@@ -33,7 +33,7 @@ See this example [pom.xml](examples/kafka/pom.xml).
 
 ```kotlin
 dependencies {
-    api("com.aerospike:aerospike-connect-inbound-sdk:1.3.2")
+    api("com.aerospike:aerospike-connect-inbound-sdk:1.4.0")
 }
 ```
 
@@ -41,6 +41,6 @@ dependencies {
 
 ```groovy
 dependencies {
-    api "com.aerospike:aerospike-connect-inbound-sdk:1.3.2"
+    api "com.aerospike:aerospike-connect-inbound-sdk:1.4.0"
 }
 ```
