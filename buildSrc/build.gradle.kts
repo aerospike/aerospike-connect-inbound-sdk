@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2012-2025 Aerospike, Inc.
+ *  Copyright 2012-2026 Aerospike, Inc.
  *
  *  Portions may be licensed to Aerospike, Inc. under one or more contributor
  *  license agreements WHICH ARE COMPATIBLE WITH THE APACHE LICENSE, VERSION 2.0.
@@ -32,8 +32,9 @@ dependencies {
     api("net.researchgate:gradle-release:3.1.0")
     api("io.snyk.gradle.plugin.snykplugin:io.snyk.gradle.plugin.snykplugin.gradle.plugin:0.7.0")
     api("com.github.breadmoirai:github-release:2.5.2")
+    api("com.github.ben-manes:gradle-versions-plugin:+")
 
-    val jacksonVersion = "2.18.4"
+    val jacksonVersion = "2.18.6"
     api("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     api("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
 }
