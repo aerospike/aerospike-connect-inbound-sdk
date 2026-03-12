@@ -2,6 +2,6 @@ ignore:
   'snyk:lic:maven:org.gnu:gnu-crypto:GPL-3.0':
     - '*':
         reason: Library Exception allows non-free use of gnu-crypto
-        expires: 2025-12-31T23:59:59.614Z
+        expires: 2026-12-31T23:59:59.614Z
 exclude:
   - ./examples
