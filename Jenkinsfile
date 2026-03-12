@@ -38,6 +38,14 @@ pipeline {
                                sh "./gradlew --no-daemon snyk-test"
                             }
                         }
+                        stage("Dependency Upgrades") {
+                            steps {
+                                script {
+                                    echo "Checking dependencies.."
+                                    sh "./gradlew dependencyUpdates -Drevision=release -DgradleReleaseChannel=current -DoutputFormatter=html --no-parallel --warning-mode all"
+                                }
+                            }
+                        }
                         stage("Tests") {
                             steps {
                                 script {
@@ -60,6 +68,14 @@ pipeline {
     }
 
     post {
+        always {
+            archiveArtifacts artifacts: '**/build/test-results/**/*.xml'
+            archiveArtifacts artifacts: '**/build/dependencyUpdates/*'
+            archiveArtifacts artifacts: '**/build/libs/**/*.jar,**/build/distributions/*', fingerprint: true
+            archiveArtifacts artifacts: '**/build/reports/**/*', fingerprint: true
+            junit testResults: '**/build/test-results/**/*.xml', keepLongStdio: true
+            recordCoverage(tools: [[parser: 'JACOCO']])
+        }
         cleanup {
             cleanWs()
         }

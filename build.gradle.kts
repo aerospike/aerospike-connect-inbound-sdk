@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2012-2025 Aerospike, Inc.
+ *  Copyright 2012-2026 Aerospike, Inc.
  *  
  *  Portions may be licensed to Aerospike, Inc. under one or more contributor
  *  license agreements WHICH ARE COMPATIBLE WITH THE APACHE LICENSE, VERSION 2.0.
@@ -46,7 +46,7 @@ allprojects {
     pluginManager.withPlugin("jacoco") {
         // If this project has the plugin applied, configure the tool version.
         jacoco {
-            toolVersion = "0.8.13"
+            toolVersion = "0.8.14"
         }
     }
 
@@ -57,6 +57,7 @@ allprojects {
         plugin("maven-publish")
         plugin("net.researchgate.release")
         plugin("io.snyk.gradle.plugin.snykplugin")
+        plugin("com.github.ben-manes.versions")
     }
 
     repositories {
@@ -67,12 +68,12 @@ allprojects {
     group = "com.aerospike"
 
     // Common dependency versions.
-    extra["aerospikeClientVersion"] = "9.2.0"
-    extra["jacksonVersion"] = "2.18.4"
+    extra["aerospikeClientVersion"] = "9.3.0"
+    extra["jacksonVersion"] = "2.18.6"
 
     dependencies {
         // Lombok for its @Generated annotation that jacoco ignores
-        val lombokVersion = "1.18.38"
+        val lombokVersion = "1.18.44"
         compileOnly("org.projectlombok:lombok:$lombokVersion")
         annotationProcessor("org.projectlombok:lombok:$lombokVersion")
 
@@ -87,7 +88,7 @@ allprojects {
 
         // Test dependencies
         testImplementation("com.aerospike:aerospike-client-jdk8:${project.extra["aerospikeClientVersion"]}")
-        testImplementation("org.junit.jupiter:junit-jupiter:5.13.4")
+        testImplementation("org.junit.jupiter:junit-jupiter:5.14.3")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     }
 
