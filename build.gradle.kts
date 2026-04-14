@@ -16,6 +16,7 @@
  *  the License.
  */
 
+import com.aerospike.connect.configureDependencyUpdate
 import com.aerospike.connect.createGithubPublishTasks
 import com.aerospike.connect.setupJavaBuild
 import com.aerospike.connect.setupPublishingTasks
@@ -68,7 +69,7 @@ allprojects {
     group = "com.aerospike"
 
     // Common dependency versions.
-    extra["aerospikeClientVersion"] = "9.3.0"
+    extra["aerospikeClientVersion"] = "10.0.0"
     extra["jacksonVersion"] = "2.18.6"
 
     dependencies {
@@ -98,4 +99,5 @@ allprojects {
     project.createGithubPublishTasks()
     project.setupVulnerabilityScanning()
     project.setupTests()
+    project.configureDependencyUpdate()
 }
