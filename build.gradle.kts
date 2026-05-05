@@ -69,8 +69,9 @@ allprojects {
     group = "com.aerospike"
 
     // Common dependency versions.
-    extra["aerospikeClientVersion"] = "10.0.0"
-    extra["jacksonVersion"] = "2.18.6"
+    extra["aerospikeClientVersion"] = "9.3.0"
+    extra["jacksonVersion"] = "2.21.2"
+    extra["jacksonAnnotationVersion"] = "2.21"
 
     dependencies {
         // Lombok for its @Generated annotation that jacoco ignores
@@ -85,7 +86,7 @@ allprojects {
         "api"("com.aerospike:aerospike-client-jdk8:${project.extra["aerospikeClientVersion"]}")
 
         // Jackson annotation
-        "api"("com.fasterxml.jackson.core:jackson-annotations:${project.extra["jacksonVersion"]}")
+        "api"("com.fasterxml.jackson.core:jackson-annotations:${project.extra["jacksonAnnotationVersion"]}")
 
         // Test dependencies
         testImplementation("com.aerospike:aerospike-client-jdk8:${project.extra["aerospikeClientVersion"]}")

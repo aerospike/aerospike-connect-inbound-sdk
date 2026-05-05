@@ -34,7 +34,7 @@ dependencies {
     api("com.github.breadmoirai:github-release:2.5.2")
     api("com.github.ben-manes:gradle-versions-plugin:+")
 
-    val jacksonVersion = "2.18.6"
+    val jacksonVersion = "2.21.2"
     api("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     api("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
 }
