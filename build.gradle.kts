@@ -69,7 +69,7 @@ allprojects {
     group = "com.aerospike"
 
     // Common dependency versions.
-    extra["aerospikeClientVersion"] = "10.0.0"
+    extra["aerospikeClientVersion"] = "9.3.0"
     extra["jacksonVersion"] = "2.21.2"
     extra["jacksonAnnotationVersion"] = "2.21"
 
