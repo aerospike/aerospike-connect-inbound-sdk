@@ -70,7 +70,7 @@ allprojects {
 
     // Common dependency versions.
     extra["aerospikeClientVersion"] = "9.3.0"
-    extra["jacksonVersion"] = "2.21.2"
+    extra["jacksonVersion"] = "2.21.4"
     extra["jacksonAnnotationVersion"] = "2.21"
 
     dependencies {
