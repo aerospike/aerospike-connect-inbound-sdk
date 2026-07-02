@@ -1,6 +1,13 @@
 pipeline {
     agent any
 
+    environment {
+        CONNECT_SNAPSHOTS_REPO_USER = credentials('connect-snapshots-repo-user')
+        CONNECT_SNAPSHOTS_REPO_PASSWORD = credentials('connect-snapshots-repo-password')
+        CONNECT_SNAPSHOTS_REPO_URL = credentials('connect-snapshots-repo-url')
+        SNYK_TOKENS = credentials('snyk-tokens')
+    }
+
     options {
         disableConcurrentBuilds()
         buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
