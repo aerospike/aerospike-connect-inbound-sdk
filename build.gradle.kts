@@ -17,6 +17,7 @@
  */
 
 import com.aerospike.connect.configureDependencyUpdate
+import com.aerospike.connect.configureProperties
 import com.aerospike.connect.createGithubPublishTasks
 import com.aerospike.connect.setupJavaBuild
 import com.aerospike.connect.setupPublishingTasks
@@ -94,6 +95,7 @@ allprojects {
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     }
 
+    project.configureProperties()
     project.setupJavaBuild()
     project.setupReleaseTasks()
     project.setupPublishingTasks()
