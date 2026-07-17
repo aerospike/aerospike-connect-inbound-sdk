@@ -28,7 +28,10 @@ usage: bash release.sh --version 1.1.0 --release-notes-file release-notes.md
   -n  (Required)          Path of release notes files
   -h                      Print usage help
 
-Requires github credentials as environment variables GITHUB_USERNAME and GITHUB_TOKEN
+Requires environment variables:
+  GITHUB_USERNAME, GITHUB_TOKEN
+  OSSRH_USERNAME, OSSRH_PASSWORD
+  SIGNING_KEY_ID, SIGNING_PASSWORD, SIGNING_SECRET_KEY_BASE64
 EOF
 }
 
@@ -75,6 +78,11 @@ echo "--------------------------------------------------------------------------
 
 # Run vulnerability scan on the module
 ./gradlew --stacktrace --no-daemon ":snyk-test"
+
+# Fail fast if Maven Central credentials are invalid
+./gradlew --stacktrace --no-daemon verifyOssrhCredentials \
+  -Prelease.useAutomaticVersion=true \
+  -Prelease.releaseVersion=$version
 
 # Run the release task
 ./gradlew --stacktrace --no-daemon release publishGithubRelease -Prelease.useAutomaticVersion=true -Prelease.releaseVersion=$version -PreleaseNotesFile="$releaseNotesFile"
