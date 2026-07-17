@@ -20,6 +20,7 @@ import com.aerospike.connect.configureDependencyUpdate
 import com.aerospike.connect.configureProperties
 import com.aerospike.connect.createGithubPublishTasks
 import com.aerospike.connect.setupJavaBuild
+import com.aerospike.connect.setupOssrhCredentialValidation
 import com.aerospike.connect.setupPublishingTasks
 import com.aerospike.connect.setupReleaseTasks
 import com.aerospike.connect.setupTests
@@ -100,6 +101,7 @@ allprojects {
     project.setupReleaseTasks()
     project.setupPublishingTasks()
     project.createGithubPublishTasks()
+    project.setupOssrhCredentialValidation()
     project.setupVulnerabilityScanning()
     project.setupTests()
     project.configureDependencyUpdate()

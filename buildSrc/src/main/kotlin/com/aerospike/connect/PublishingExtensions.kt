@@ -40,6 +40,8 @@ fun Project.setupPublishingTasks() {
         val connectSnapshotsRepo: String by project
         val connectSnapshotsRepoUser: String by project
         val connectSnapshotsRepoPassword: String by project
+        val ossrhUsername: String by project
+        val ossrhPassword: String by project
 
         maven {
             val releaseRepo =
@@ -49,12 +51,12 @@ fun Project.setupPublishingTasks() {
             url = if (!isSnapshotVersion()) releaseRepo else snapshotRepo
             credentials {
                 username = if (!isSnapshotVersion()) {
-                    project.properties["ossrhUsername"] as? String
+                    ossrhUsername
                 } else {
                     connectSnapshotsRepoUser
                 }
                 password = if (!isSnapshotVersion()) {
-                    project.properties["ossrhPassword"] as? String
+                    ossrhPassword
                 } else {
                     connectSnapshotsRepoPassword
                 }
@@ -124,5 +126,15 @@ fun Project.setupPublishingTasks() {
     }
 
     val signing = (project.extensions["signing"] as SigningExtension)
+    val signingSecretKey = findProperty("signing.secretKey") as? String
+    if (signingSecretKey != null) {
+        val signingKeyId: String by project
+        val signingPassword: String by project
+        signing.useInMemoryPgpKeys(
+            signingKeyId,
+            signingSecretKey,
+            signingPassword
+        )
+    }
     signing.sign(publishing.publications.getByName("mavenJava"))
 }
