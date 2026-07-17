@@ -128,8 +128,15 @@ fun Project.setupPublishingTasks() {
     val signing = (project.extensions["signing"] as SigningExtension)
     val signingSecretKey = findProperty("signing.secretKey") as? String
     if (signingSecretKey != null) {
-        val signingKeyId: String by project
-        val signingPassword: String by project
+        val signingKeyId = findProperty("signing.keyId") as? String
+            ?: error(
+                "signing.keyId not configured (SIGNING_KEY_ID / signing.keyId)"
+            )
+        val signingPassword = findProperty("signing.password") as? String
+            ?: error(
+                "signing.password not configured " +
+                    "(SIGNING_PASSWORD / signing.password)"
+            )
         signing.useInMemoryPgpKeys(
             signingKeyId,
             signingSecretKey,
