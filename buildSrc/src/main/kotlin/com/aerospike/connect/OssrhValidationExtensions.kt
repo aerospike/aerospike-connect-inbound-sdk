@@ -24,8 +24,8 @@ import java.net.HttpURLConnection
 import java.net.URI
 import java.util.Base64
 
-private const val OSSRH_PROFILE_URL =
-    "https://ossrh-staging-api.central.sonatype.com/service/local/staging/profile"
+private const val OSSRH_CREDENTIALS_URL =
+    "https://ossrh-staging-api.central.sonatype.com/manual/search/repositories?ip=any"
 
 /**
  * Register OSSRH credential validation and wire it ahead of publish tasks so
@@ -65,9 +65,10 @@ private fun Project.verifyOssrhCredentials() {
             "OSSRH password not configured (ossrhPassword / OSSRH_PASSWORD)"
         )
 
-    val connection = URI(OSSRH_PROFILE_URL).toURL().openConnection()
+    val connection = URI(OSSRH_CREDENTIALS_URL).toURL().openConnection()
         as HttpURLConnection
     connection.requestMethod = "GET"
+    // Use the same Basic auth that maven-publish sends for release uploads.
     connection.setRequestProperty(
         "Authorization",
         "Basic " + Base64.getEncoder().encodeToString(
@@ -78,6 +79,7 @@ private fun Project.verifyOssrhCredentials() {
     val responseCode = connection.responseCode
     if (responseCode != HttpURLConnection.HTTP_OK) {
         val errorBody = connection.errorStream?.bufferedReader()?.readText()
+            ?: connection.inputStream?.bufferedReader()?.readText()
         throw GradleException(
             "OSSRH credential validation failed (HTTP $responseCode)" +
                 (errorBody?.let { ": $it" } ?: "")
