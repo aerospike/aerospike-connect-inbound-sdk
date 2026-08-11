@@ -1,16 +1,6 @@
 version: 2
 updates:
-  - package-ecosystem: maven
-    directory: /examples/jms
-    schedule:
-      interval: daily
-
-  - package-ecosystem: maven
-    directory: /examples/kafka
-    schedule:
-      interval: daily
-
-  - package-ecosystem: maven
-    directory: /examples/pulsar
+  - package-ecosystem: gradle
+    directory: /
     schedule:
       interval: daily
