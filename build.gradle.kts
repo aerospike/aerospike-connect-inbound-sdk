@@ -77,7 +77,7 @@ allprojects {
 
     dependencies {
         // Lombok for its @Generated annotation that jacoco ignores
-        val lombokVersion = "1.18.44"
+        val lombokVersion = "1.18.46"
         compileOnly("org.projectlombok:lombok:$lombokVersion")
         annotationProcessor("org.projectlombok:lombok:$lombokVersion")
 
