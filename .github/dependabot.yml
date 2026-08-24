@@ -4,3 +4,18 @@ updates:
     directory: /
     schedule:
       interval: daily
+
+  - package-ecosystem: maven
+    directory: /examples/jms
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: maven
+    directory: /examples/kafka
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: maven
+    directory: /examples/pulsar
+    schedule:
+      interval: weekly
