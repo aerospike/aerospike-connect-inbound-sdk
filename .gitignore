@@ -96,3 +96,6 @@ build/
 /.idea/saveactions_settings.xml
 /.idea/kotlinScripting.xml
 /snyk
+
+# One-time Maven Central setup notes; not part of the public release docs.
+docs/maven-central-first-release.md

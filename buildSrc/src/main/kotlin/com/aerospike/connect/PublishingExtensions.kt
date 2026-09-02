@@ -21,48 +21,19 @@ package com.aerospike.connect
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.get
-import org.gradle.kotlin.dsl.provideDelegate
-import org.gradle.kotlin.dsl.withType
-import org.gradle.plugins.signing.SigningExtension
-import java.net.URI
 
 /**
- * Setup publishing tasks.
+ * Setup the Maven publication.
+ *
+ * No repository is registered. The release workflow only generates the POM and
+ * Gradle Module Metadata from this publication; signing, deployment, and Maven
+ * Central publication are owned by aerospike/shared-workflows.
  */
 fun Project.setupPublishingTasks() {
     val publishing =
         (project.extensions["publishing"] as PublishingExtension)
-
-    publishing.repositories {
-        val connectSnapshotsRepo: String by project
-        val connectSnapshotsRepoUser: String by project
-        val connectSnapshotsRepoPassword: String by project
-        val ossrhUsername: String by project
-        val ossrhPassword: String by project
-
-        maven {
-            val releaseRepo =
-                URI("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
-            val snapshotRepo = URI(connectSnapshotsRepo)
-
-            url = if (!isSnapshotVersion()) releaseRepo else snapshotRepo
-            credentials {
-                username = if (!isSnapshotVersion()) {
-                    ossrhUsername
-                } else {
-                    connectSnapshotsRepoUser
-                }
-                password = if (!isSnapshotVersion()) {
-                    ossrhPassword
-                } else {
-                    connectSnapshotsRepoPassword
-                }
-            }
-        }
-    }
 
     publishing.publications {
         create<MavenPublication>("mavenJava") {
@@ -114,34 +85,4 @@ fun Project.setupPublishingTasks() {
             }
         }
     }
-
-    tasks.withType<PublishToMavenRepository>().configureEach {
-        onlyIf {
-            // Upload if snapshot version.
-            // If a proper release version upload only when release task is
-            // present. This prevents re-releasing re-builds of released
-            // version.
-            isSnapshotVersion() || hasReleaseTask()
-        }
-    }
-
-    val signing = (project.extensions["signing"] as SigningExtension)
-    val signingSecretKey = findProperty("signing.secretKey") as? String
-    if (signingSecretKey != null) {
-        val signingKeyId = findProperty("signing.keyId") as? String
-            ?: error(
-                "signing.keyId not configured (SIGNING_KEY_ID / signing.keyId)"
-            )
-        val signingPassword = findProperty("signing.password") as? String
-            ?: error(
-                "signing.password not configured " +
-                    "(SIGNING_PASSWORD / signing.password)"
-            )
-        signing.useInMemoryPgpKeys(
-            signingKeyId,
-            signingSecretKey,
-            signingPassword
-        )
-    }
-    signing.sign(publishing.publications.getByName("mavenJava"))
 }

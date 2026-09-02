@@ -44,3 +44,8 @@ dependencies {
     api "com.aerospike:aerospike-connect-inbound-sdk:1.4.4"
 }
 ```
+
+## Releasing
+
+Development lands on `stage`. Merge `stage` into `master` immediately before
+tagging a release. See [docs/releasing.md](docs/releasing.md).

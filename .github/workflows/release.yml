@@ -1,0 +1,150 @@
+name: Build and promote SDK release
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+-rc[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version (for example, 1.4.5 or 1.4.5-rc1)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+# One release at a time across tags and workflow_dispatch. Do not cancel an
+# in-progress release (partial JFrog deploy/promotion). Later runs queue.
+concurrency:
+  group: sdk-release
+  cancel-in-progress: false
+
+env:
+  BUNDLE_NAME: aerospike-connect-inbound-sdk
+
+jobs:
+  release-metadata:
+    name: Resolve release metadata
+    runs-on: ubuntu-22.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Resolve and validate version
+        id: version
+        shell: bash
+        env:
+          DISPATCH_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          version="${DISPATCH_VERSION:-${GITHUB_REF_NAME}}"
+          version="${version#v}"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+)?$ ]]; then
+            echo "Invalid release version: $version" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  build-sign-deploy:
+    name: Build, sign, and deploy
+    needs: release-metadata
+    uses: aerospike/shared-workflows/.github/workflows/reusable_artifacts-cicd.yaml@7c8b65df2568974435ab8b40c9e9de6eae13b3bb # main, includes shared-workflows#293
+    with:
+      gh-workflows-ref: 7c8b65df2568974435ab8b40c9e9de6eae13b3bb
+      gh-artifact-directory: dist
+      gh-retention-days: 5
+      jf-project: connect
+      jf-build-name: aerospike-connect-inbound-sdk
+      oidc-provider-name: gh-aerospike
+      oidc-audience: aerospike
+      version: ${{ needs.release-metadata.outputs.version }}
+      build-type: release
+      jar-group-id: com.aerospike
+      setup-java: true
+      java-version: "17"
+      java-distribution: temurin
+      java-cache: gradle
+      build-env: VERSION=${{ needs.release-metadata.outputs.version }};SNYK_TOKENS=unused
+      build-script: |
+        set -euo pipefail
+        ./gradlew --no-daemon \
+          -Pversion="$VERSION" \
+          clean build sourcesJar javadocJar \
+          generatePomFileForMavenJavaPublication \
+          generateMetadataFileForMavenJavaPublication
+
+        mkdir -p dist
+        cp build/libs/*.jar dist/
+        cp build/publications/mavenJava/pom-default.xml \
+          "dist/aerospike-connect-inbound-sdk-${VERSION}.pom"
+        # deploy-artifacts picks up stem-based Maven companions, so the Gradle
+        # Module Metadata file must share the JAR stem.
+        cp build/publications/mavenJava/module.json \
+          "dist/aerospike-connect-inbound-sdk-${VERSION}.module"
+        ls -la dist
+    secrets:
+      gpg-private-key: ${{ secrets.GPG_SECRET_KEY }}
+      gpg-public-key: ${{ secrets.GPG_PUBLIC_KEY }}
+      gpg-key-pass: ${{ secrets.GPG_PASS }}
+
+  create-release-bundle:
+    name: Create release bundle
+    needs:
+      - release-metadata
+      - build-sign-deploy
+    uses: aerospike/shared-workflows/.github/workflows/reusable_create-release-bundle.yaml@7c8b65df2568974435ab8b40c9e9de6eae13b3bb # main, includes shared-workflows#293
+    with:
+      gh-workflows-ref: 7c8b65df2568974435ab8b40c9e9de6eae13b3bb
+      jf-project: connect
+      jf-build-names: ${{ needs.build-sign-deploy.outputs.jf-build-name }}:${{ needs.build-sign-deploy.outputs.jf-build-id }}
+      jf-bundle-name: aerospike-connect-inbound-sdk
+      oidc-provider-name: gh-aerospike
+      oidc-audience: aerospike
+      version: ${{ needs.release-metadata.outputs.version }}
+
+  promote:
+    name: Promote through DEV, TEST, and STAGE
+    needs:
+      - release-metadata
+      - create-release-bundle
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Set up JFrog CLI
+        uses: step-security/setup-jfrog-cli@53aeacb709fce45d0baf69a13ec3342f7e2d71a9 # v5.1.0
+        env:
+          # The JFrog CLI action has no default URL, unlike the reusable
+          # workflows, so this job sets the platform URL explicitly.
+          JF_URL: https://artifact.aerospike.io
+          JF_PROJECT: connect
+        with:
+          oidc-provider-name: gh-aerospike
+          oidc-audience: aerospike
+
+      - name: Promote to DEV
+        uses: aerospike/shared-workflows/.github/actions/promote-release-bundle@7c8b65df2568974435ab8b40c9e9de6eae13b3bb # main, includes shared-workflows#293
+        with:
+          bundle-name: ${{ env.BUNDLE_NAME }}
+          version: ${{ needs.release-metadata.outputs.version }}
+          environment: DEV
+          jf-project: connect
+
+      - name: Promote to TEST
+        uses: aerospike/shared-workflows/.github/actions/promote-release-bundle@7c8b65df2568974435ab8b40c9e9de6eae13b3bb # main, includes shared-workflows#293
+        with:
+          bundle-name: ${{ env.BUNDLE_NAME }}
+          version: ${{ needs.release-metadata.outputs.version }}
+          environment: TEST
+          jf-project: connect
+
+      - name: Promote to STAGE
+        uses: aerospike/shared-workflows/.github/actions/promote-release-bundle@7c8b65df2568974435ab8b40c9e9de6eae13b3bb # main, includes shared-workflows#293
+        with:
+          bundle-name: ${{ env.BUNDLE_NAME }}
+          version: ${{ needs.release-metadata.outputs.version }}
+          environment: STAGE
+          jf-project: connect
+

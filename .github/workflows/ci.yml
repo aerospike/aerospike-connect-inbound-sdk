@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+    branches:
+      - master
+      - stage
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and verify
+    runs-on: ubuntu-22.04
+    env:
+      # An empty value still lets Gradle configure the Snyk plugin for forked
+      # pull requests; the scan itself is skipped when secrets are unavailable.
+      SNYK_TOKENS: ${{ secrets.SNYK_TOKENS }}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build SDK
+        run: ./gradlew --no-daemon clean build
+
+      - name: Build JMS example
+        run: mvn -B -Dstyle.color=never -f examples/jms -U clean install
+
+      - name: Build Kafka example
+        run: mvn -B -Dstyle.color=never -f examples/kafka clean install
+
+      - name: Build Pulsar example
+        run: mvn -B -Dstyle.color=never -f examples/pulsar clean install
+
+      - name: Scan dependencies with Snyk
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
+        run: ./gradlew --no-daemon snyk-test
+
+      - name: Check dependency upgrades
+        run: >-
+          ./gradlew --no-daemon dependencyUpdates
+          -Drevision=release
+          -DgradleReleaseChannel=current
+          -DoutputFormatter=html
+          --no-parallel
+          --warning-mode=all
+
+      - name: Upload build reports and artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-artifacts
+          if-no-files-found: warn
+          retention-days: 5
+          path: |
+            **/build/test-results/**/*.xml
+            **/build/dependencyUpdates/*
+            **/build/libs/**/*.jar
+            **/build/distributions/*
+            **/build/reports/**/*
