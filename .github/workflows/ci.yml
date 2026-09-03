@@ -17,14 +17,8 @@ concurrency:
 
 jobs:
   build:
-    name: Build and verify
+    name: Build SDK
     runs-on: ubuntu-22.04
-    env:
-      # The build reads a comma-separated SNYK_TOKENS list. An empty value
-      # still lets Gradle configure the Snyk plugin for forked pull requests;
-      # the scan itself is skipped when the secret is unavailable.
-      SNYK_TOKENS: ${{ secrets.SNYK_TOKEN }}
-
     steps:
       - name: Check out source
         uses: actions/checkout@v4
@@ -40,19 +34,6 @@ jobs:
 
       - name: Build SDK
         run: ./gradlew --no-daemon clean build
-
-      - name: Build JMS example
-        run: mvn -B -Dstyle.color=never -f examples/jms -U clean install
-
-      - name: Build Kafka example
-        run: mvn -B -Dstyle.color=never -f examples/kafka clean install
-
-      - name: Build Pulsar example
-        run: mvn -B -Dstyle.color=never -f examples/pulsar clean install
-
-      - name: Scan dependencies with Snyk
-        if: env.SNYK_TOKENS != ''
-        run: ./gradlew --no-daemon snyk-test
 
       - name: Check dependency upgrades
         run: >-
@@ -76,3 +57,48 @@ jobs:
             **/build/libs/**/*.jar
             **/build/distributions/*
             **/build/reports/**/*
+
+  snyk:
+    name: Scan dependencies with Snyk
+    runs-on: ubuntu-22.04
+    env:
+      SNYK_TOKENS: ${{ secrets.SNYK_TOKEN }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Scan dependencies with Snyk
+        if: env.SNYK_TOKENS != ''
+        run: ./gradlew --no-daemon snyk-test
+
+  examples:
+    name: Build examples
+    needs: build
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Build JMS example
+        run: mvn -B -Dstyle.color=never -f examples/jms -U clean install
+
+      - name: Build Kafka example
+        run: mvn -B -Dstyle.color=never -f examples/kafka clean install
+
+      - name: Build Pulsar example
+        run: mvn -B -Dstyle.color=never -f examples/pulsar clean install
