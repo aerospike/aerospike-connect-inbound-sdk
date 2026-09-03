@@ -13,8 +13,7 @@ one run. PROD is the org approval path;
 [`citrusleaf/artifact-publisher`](https://github.com/citrusleaf/artifact-publisher)
 publishes to Maven Central after PROD, not STAGE.
 
-JFrog bundle versions are immutable. Rebuilds need a new version (same idea as
-aerospike-spark `_build01`):
+JFrog bundle versions are immutable. Rebuilds need a new version:
 
 | Cut | Bundle / JAR | Annotation |
 | --- | --- | --- |

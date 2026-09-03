@@ -6,10 +6,10 @@
 #   3. Consume the DEV Maven repo from a downstream project
 #   4. Promote TEST then STAGE with the "Promote SDK release bundle" workflow
 #
-# Each JFrog bundle version is immutable. Rebuilds must use a new version, the
-# same way aerospike-spark uses v5.0.4_spark35_build01 instead of deleting
-# v5.0.4_spark35. After create, the bundle is annotated with the logical
-# version (build suffix stripped) so rebuilds stay grouped.
+# Each JFrog bundle version is immutable. Rebuilds must use a new version
+# instead of deleting and recreating the same name. After create, the bundle is
+# annotated with the logical version (build suffix stripped) so rebuilds stay
+# grouped.
 #
 # VERSION EXAMPLES:
 #   1.4.5           -> bundle and JAR 1.4.5
