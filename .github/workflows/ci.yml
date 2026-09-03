@@ -20,9 +20,10 @@ jobs:
     name: Build and verify
     runs-on: ubuntu-22.04
     env:
-      # An empty value still lets Gradle configure the Snyk plugin for forked
-      # pull requests; the scan itself is skipped when secrets are unavailable.
-      SNYK_TOKENS: ${{ secrets.SNYK_TOKENS }}
+      # The build reads a comma-separated SNYK_TOKENS list. An empty value
+      # still lets Gradle configure the Snyk plugin for forked pull requests;
+      # the scan itself is skipped when the secret is unavailable.
+      SNYK_TOKENS: ${{ secrets.SNYK_TOKEN }}
 
     steps:
       - name: Check out source
@@ -50,7 +51,7 @@ jobs:
         run: mvn -B -Dstyle.color=never -f examples/pulsar clean install
 
       - name: Scan dependencies with Snyk
-        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
+        if: env.SNYK_TOKENS != ''
         run: ./gradlew --no-daemon snyk-test
 
       - name: Check dependency upgrades
