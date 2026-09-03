@@ -17,7 +17,6 @@
  */
 
 import com.aerospike.connect.configureDependencyUpdate
-import com.aerospike.connect.configureProperties
 import com.aerospike.connect.setupJavaBuild
 import com.aerospike.connect.setupPublishingTasks
 import com.aerospike.connect.setupTests
@@ -91,7 +90,6 @@ allprojects {
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     }
 
-    project.configureProperties()
     project.setupJavaBuild()
     project.setupPublishingTasks()
     project.setupVulnerabilityScanning()
