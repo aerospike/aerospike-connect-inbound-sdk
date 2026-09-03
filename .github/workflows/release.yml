@@ -1,16 +1,39 @@
-name: Build and promote SDK release
+# Builds, signs, and publishes the SDK to JFrog, then promotes the bundle to DEV.
+#
+# USAGE:
+#   1. Merge stage into master when you are ready to cut a candidate
+#   2. Push a unique tag, or run this workflow and enter the version
+#   3. Consume the DEV Maven repo from a downstream project
+#   4. Promote TEST then STAGE with the "Promote SDK release bundle" workflow
+#
+# Each JFrog bundle version is immutable. Rebuilds must use a new version, the
+# same way aerospike-spark uses v5.0.4_spark35_build01 instead of deleting
+# v5.0.4_spark35. After create, the bundle is annotated with the logical
+# version (build suffix stripped) so rebuilds stay grouped.
+#
+# VERSION EXAMPLES:
+#   1.4.5           -> bundle and JAR 1.4.5
+#   1.4.5-rc1       -> first release candidate
+#   1.4.5-rc1-build01 -> rebuild of that candidate; annotate tag 1.4.5-rc1
+#   1.4.5-build01   -> rebuild of 1.4.5; annotate tag 1.4.5
+#
+name: Build SDK release to DEV
 
 on:
   push:
     tags:
       - "[0-9]+.[0-9]+.[0-9]+"
       - "[0-9]+.[0-9]+.[0-9]+-rc[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+-rc[0-9]+-build[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+-build[0-9]+"
       - "v[0-9]+.[0-9]+.[0-9]+"
       - "v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+-build[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-build[0-9]+"
   workflow_dispatch:
     inputs:
       version:
-        description: Release version (for example, 1.4.5 or 1.4.5-rc1)
+        description: Unique bundle/JAR version (for example, 1.4.5, 1.4.5-rc1, or 1.4.5-rc1-build01)
         required: true
         type: string
 
@@ -18,8 +41,7 @@ permissions:
   contents: read
   id-token: write
 
-# One release at a time across tags and workflow_dispatch. Do not cancel an
-# in-progress release (partial JFrog deploy/promotion). Later runs queue.
+# One release at a time. Do not cancel an in-progress deploy/promotion.
 concurrency:
   group: sdk-release
   cancel-in-progress: false
@@ -33,6 +55,7 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       version: ${{ steps.version.outputs.version }}
+      annotate-tag: ${{ steps.version.outputs.annotate-tag }}
     steps:
       - name: Resolve and validate version
         id: version
@@ -43,11 +66,18 @@ jobs:
           set -euo pipefail
           version="${DISPATCH_VERSION:-${GITHUB_REF_NAME}}"
           version="${version#v}"
-          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+)?$ ]]; then
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+)?(-build[0-9]+)?$ ]]; then
             echo "Invalid release version: $version" >&2
+            echo "Use X.Y.Z, X.Y.Z-rcN, and/or X.Y.Z[-rcN]-buildN." >&2
             exit 1
           fi
+          if [[ "$version" =~ ^(.*)-build[0-9]+$ ]]; then
+            annotate_tag="${BASH_REMATCH[1]}"
+          else
+            annotate_tag="$version"
+          fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "annotate-tag=$annotate_tag" >> "$GITHUB_OUTPUT"
 
   build-sign-deploy:
     name: Build, sign, and deploy
@@ -106,8 +136,8 @@ jobs:
       oidc-audience: aerospike
       version: ${{ needs.release-metadata.outputs.version }}
 
-  promote:
-    name: Promote through DEV, TEST, and STAGE
+  promote-to-dev:
+    name: Annotate and promote to DEV
     needs:
       - release-metadata
       - create-release-bundle
@@ -124,6 +154,18 @@ jobs:
           oidc-provider-name: gh-aerospike
           oidc-audience: aerospike
 
+      - name: Annotate logical version
+        env:
+          BUNDLE_VERSION: ${{ needs.release-metadata.outputs.version }}
+          ANNOTATE_TAG: ${{ needs.release-metadata.outputs.annotate-tag }}
+        run: |
+          set -euo pipefail
+          echo "Annotating ${{ env.BUNDLE_NAME }}/${BUNDLE_VERSION} with tag ${ANNOTATE_TAG}"
+          jf release-bundle-annotate "${{ env.BUNDLE_NAME }}" \
+            "$BUNDLE_VERSION" \
+            --project=connect \
+            --tag="$ANNOTATE_TAG"
+
       - name: Promote to DEV
         uses: aerospike/shared-workflows/.github/actions/promote-release-bundle@7c8b65df2568974435ab8b40c9e9de6eae13b3bb # main, includes shared-workflows#293
         with:
@@ -131,20 +173,3 @@ jobs:
           version: ${{ needs.release-metadata.outputs.version }}
           environment: DEV
           jf-project: connect
-
-      - name: Promote to TEST
-        uses: aerospike/shared-workflows/.github/actions/promote-release-bundle@7c8b65df2568974435ab8b40c9e9de6eae13b3bb # main, includes shared-workflows#293
-        with:
-          bundle-name: ${{ env.BUNDLE_NAME }}
-          version: ${{ needs.release-metadata.outputs.version }}
-          environment: TEST
-          jf-project: connect
-
-      - name: Promote to STAGE
-        uses: aerospike/shared-workflows/.github/actions/promote-release-bundle@7c8b65df2568974435ab8b40c9e9de6eae13b3bb # main, includes shared-workflows#293
-        with:
-          bundle-name: ${{ env.BUNDLE_NAME }}
-          version: ${{ needs.release-metadata.outputs.version }}
-          environment: STAGE
-          jf-project: connect
-
