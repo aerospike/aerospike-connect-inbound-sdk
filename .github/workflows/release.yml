@@ -2,38 +2,30 @@
 #
 # USAGE:
 #   1. Merge stage into master when you are ready to cut a candidate
-#   2. Push a unique tag, or run this workflow and enter the version
+#   2. Push a unique -N tag, or run this workflow and enter the version
 #   3. Consume the DEV Maven repo from a downstream project
 #   4. Promote TEST then STAGE with the "Promote SDK release bundle" workflow
 #
-# Each JFrog bundle version is immutable. Rebuilds must use a new version
-# instead of deleting and recreating the same name. After create, the bundle is
-# annotated with the logical version (build suffix stripped) so rebuilds stay
-# grouped.
+# Each JFrog bundle version is immutable. Every release uses a new -N suffix on
+# the logical version from gradle.properties. Bundle, tag, and Maven GAV share the
+# same version (for example, 1.4.5-1). Bundles are annotated with the logical
+# version so attempts for the same line stay grouped.
 #
-# VERSION EXAMPLES:
-#   1.4.5           -> bundle and JAR 1.4.5
-#   1.4.5-rc1       -> first release candidate
-#   1.4.5-rc1-build01 -> rebuild of that candidate; annotate tag 1.4.5-rc1
-#   1.4.5-build01   -> rebuild of 1.4.5; annotate tag 1.4.5
+# VERSION EXAMPLES (gradle.properties version=1.4.5):
+#   1.4.5-1 -> bundle, tag, and Maven/JAR 1.4.5-1; annotate 1.4.5
+#   1.4.5-2 -> bundle, tag, and Maven/JAR 1.4.5-2; annotate 1.4.5
 #
 name: Build SDK release to DEV
 
 on:
   push:
     tags:
-      - "[0-9]+.[0-9]+.[0-9]+"
-      - "[0-9]+.[0-9]+.[0-9]+-rc[0-9]+"
-      - "[0-9]+.[0-9]+.[0-9]+-rc[0-9]+-build[0-9]+"
-      - "[0-9]+.[0-9]+.[0-9]+-build[0-9]+"
-      - "v[0-9]+.[0-9]+.[0-9]+"
-      - "v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+"
-      - "v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+-build[0-9]+"
-      - "v[0-9]+.[0-9]+.[0-9]+-build[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+-[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-[0-9]+"
   workflow_dispatch:
     inputs:
       version:
-        description: Unique bundle/JAR version (for example, 1.4.5, 1.4.5-rc1, or 1.4.5-rc1-build01)
+        description: Release version with required -N suffix (for example, 1.4.5-1)
         required: true
         type: string
 
@@ -56,6 +48,7 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
       annotate-tag: ${{ steps.version.outputs.annotate-tag }}
+      maven-version: ${{ steps.version.outputs.maven-version }}
     steps:
       - name: Resolve and validate version
         id: version
@@ -66,18 +59,23 @@ jobs:
           set -euo pipefail
           version="${DISPATCH_VERSION:-${GITHUB_REF_NAME}}"
           version="${version#v}"
-          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+)?(-build[0-9]+)?$ ]]; then
+          if [[ ! "$version" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-([0-9]+)$ ]]; then
             echo "Invalid release version: $version" >&2
-            echo "Use X.Y.Z, X.Y.Z-rcN, and/or X.Y.Z[-rcN]-buildN." >&2
+            echo "Use X.Y.Z-N (for example, 1.4.5-1)." >&2
             exit 1
           fi
-          if [[ "$version" =~ ^(.*)-build[0-9]+$ ]]; then
-            annotate_tag="${BASH_REMATCH[1]}"
-          else
-            annotate_tag="$version"
+          logical_version="${BASH_REMATCH[1]}"
+          build_number=$((10#${BASH_REMATCH[2]}))
+          if (( build_number < 1 )); then
+            echo "Build number N must be at least 1 in $version" >&2
+            exit 1
           fi
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "annotate-tag=$annotate_tag" >> "$GITHUB_OUTPUT"
+          release_version="${logical_version}-${build_number}"
+          echo "version=$release_version" >> "$GITHUB_OUTPUT"
+          echo "annotate-tag=$logical_version" >> "$GITHUB_OUTPUT"
+          echo "maven-version=$release_version" >> "$GITHUB_OUTPUT"
+          echo "Release version: $release_version"
+          echo "Annotation tag: $logical_version"
 
   build-sign-deploy:
     name: Build, sign, and deploy
@@ -98,11 +96,16 @@ jobs:
       java-version: "17"
       java-distribution: temurin
       java-cache: gradle
-      build-env: VERSION=${{ needs.release-metadata.outputs.version }};SNYK_TOKENS=unused
+      build-env: BUNDLE_VERSION=${{ needs.release-metadata.outputs.version }};MAVEN_VERSION=${{ needs.release-metadata.outputs.maven-version }};LOGICAL_VERSION=${{ needs.release-metadata.outputs.annotate-tag }};SNYK_TOKENS=unused
       build-script: |
         set -euo pipefail
+        gradle_version=$(grep '^version=' gradle.properties | cut -d= -f2)
+        if [[ "$LOGICAL_VERSION" != "$gradle_version" ]]; then
+          echo "gradle.properties version ($gradle_version) must match bundle logical version ($LOGICAL_VERSION)" >&2
+          exit 1
+        fi
         ./gradlew --no-daemon \
-          -Pversion="$VERSION" \
+          -Pversion="$MAVEN_VERSION" \
           clean build sourcesJar javadocJar \
           generatePomFileForMavenJavaPublication \
           generateMetadataFileForMavenJavaPublication
@@ -110,11 +113,11 @@ jobs:
         mkdir -p dist
         cp build/libs/*.jar dist/
         cp build/publications/mavenJava/pom-default.xml \
-          "dist/aerospike-connect-inbound-sdk-${VERSION}.pom"
+          "dist/aerospike-connect-inbound-sdk-${MAVEN_VERSION}.pom"
         # deploy-artifacts picks up stem-based Maven companions, so the Gradle
         # Module Metadata file must share the JAR stem.
         cp build/publications/mavenJava/module.json \
-          "dist/aerospike-connect-inbound-sdk-${VERSION}.module"
+          "dist/aerospike-connect-inbound-sdk-${MAVEN_VERSION}.module"
         ls -la dist
     secrets:
       gpg-private-key: ${{ secrets.GPG_SECRET_KEY }}
