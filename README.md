@@ -47,5 +47,7 @@ dependencies {
 
 ## Releasing
 
-Development lands on `stage`. Merge `stage` into `master` immediately before
-tagging a release. See [docs/releasing.md](docs/releasing.md).
+Development lands on `stage`. Tag QE builds (`X.Y.Z-N`) from `stage`. After
+certification, merge `stage` into `master` with a merge commit and tag GA
+(`X.Y.Z`) at the same commit as the highest `-N`. See
+[docs/releasing.md](docs/releasing.md).

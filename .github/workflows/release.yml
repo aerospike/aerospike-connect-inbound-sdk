@@ -1,19 +1,22 @@
 # Builds, signs, and publishes the SDK to JFrog, then promotes the bundle to DEV.
 #
 # USAGE:
-#   1. Merge stage into master when you are ready to cut a candidate
-#   2. Push a unique -N tag, or run this workflow and enter the version
-#   3. Consume the DEV Maven repo from a downstream project
-#   4. Promote TEST then STAGE with the "Promote SDK release bundle" workflow
+#   QE: squash stage, tag X.Y.Z-N from stage, promote that bundle for certification
+#   GA: merge stage into master with a merge commit, then tag X.Y.Z at the same
+#       commit as the highest -N (the squash commit, not master HEAD). Push a
+#       tag, or run this workflow and enter the version.
+#   Then consume DEV and promote TEST then STAGE with "Promote SDK release bundle".
 #
-# Each JFrog bundle version is immutable. Every release uses a new -N suffix on
-# the logical version from gradle.properties. Bundle, tag, and Maven GAV share the
-# same version (for example, 1.4.5-1). Bundles are annotated with the logical
-# version so attempts for the same line stay grouped.
+# QE bundles are immutable; each certification attempt uses a new -N. The GA
+# bundle is X.Y.Z at the certified commit (commit-id similarity, not byte-identical
+# rebuild). Bundle, tag, and Maven GAV share the same version. Both kinds are
+# annotated with the logical version from gradle.properties.
 #
 # VERSION EXAMPLES (gradle.properties version=1.4.5):
-#   1.4.5-1 -> bundle, tag, and Maven/JAR 1.4.5-1; annotate 1.4.5
-#   1.4.5-2 -> bundle, tag, and Maven/JAR 1.4.5-2; annotate 1.4.5
+#   1.4.5-1 -> QE bundle/tag/Maven 1.4.5-1 on stage; annotate 1.4.5
+#   1.4.5-2 -> QE rebuild at a new squash commit; annotate 1.4.5
+#   1.4.5   -> GA at the same commit as the highest -N (reachable from master);
+#              annotate 1.4.5
 #
 name: Build SDK release to DEV
 
@@ -22,10 +25,12 @@ on:
     tags:
       - "[0-9]+.[0-9]+.[0-9]+-[0-9]+"
       - "v[0-9]+.[0-9]+.[0-9]+-[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+"
   workflow_dispatch:
     inputs:
       version:
-        description: Release version with required -N suffix (for example, 1.4.5-1)
+        description: QE X.Y.Z-N (for example, 1.4.5-1) or GA X.Y.Z (for example, 1.4.5)
         required: true
         type: string
 
@@ -55,6 +60,12 @@ jobs:
         with:
           egress-policy: audit
 
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
       - name: Resolve and validate version
         id: version
         shell: bash
@@ -64,22 +75,70 @@ jobs:
           set -euo pipefail
           version="${DISPATCH_VERSION:-${GITHUB_REF_NAME}}"
           version="${version#v}"
-          if [[ ! "$version" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-([0-9]+)$ ]]; then
+          if [[ "$version" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-([0-9]+)$ ]]; then
+            kind=qe
+            logical_version="${BASH_REMATCH[1]}"
+            build_number=$((10#${BASH_REMATCH[2]}))
+            if (( build_number < 1 )); then
+              echo "Build number N must be at least 1 in $version" >&2
+              exit 1
+            fi
+            release_version="${logical_version}-${build_number}"
+          elif [[ "$version" =~ ^([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            kind=ga
+            logical_version="${BASH_REMATCH[1]}"
+            release_version="$logical_version"
+          else
             echo "Invalid release version: $version" >&2
-            echo "Use X.Y.Z-N (for example, 1.4.5-1)." >&2
+            echo "Use X.Y.Z-N for QE (for example, 1.4.5-1) or X.Y.Z for GA (for example, 1.4.5)." >&2
             exit 1
           fi
-          logical_version="${BASH_REMATCH[1]}"
-          build_number=$((10#${BASH_REMATCH[2]}))
-          if (( build_number < 1 )); then
-            echo "Build number N must be at least 1 in $version" >&2
-            exit 1
+
+          git fetch origin --tags
+          current="$GITHUB_SHA"
+          if [[ "$kind" == qe ]]; then
+            if ! git merge-base --is-ancestor "$current" origin/stage; then
+              echo "QE version $release_version must be tagged from a commit on stage" >&2
+              exit 1
+            fi
+          else
+            if ! git merge-base --is-ancestor "$current" origin/master; then
+              echo "GA version $release_version must be tagged from a commit on master" >&2
+              exit 1
+            fi
+            logical_re="${logical_version//./\\.}"
+            highest=0
+            highest_tag=""
+            while IFS= read -r tag; do
+              [[ -z "$tag" ]] && continue
+              t="${tag#refs/tags/}"
+              t="${t#v}"
+              if [[ "$t" =~ ^${logical_re}-([0-9]+)$ ]]; then
+                n=$((10#${BASH_REMATCH[1]}))
+                if (( n > highest )); then
+                  highest=$n
+                  highest_tag="${tag#refs/tags/}"
+                fi
+              fi
+            done < <(git tag -l "${logical_version}-*" "v${logical_version}-*")
+            if [[ -z "$highest_tag" ]]; then
+              echo "GA $release_version requires a QE tag ${logical_version}-N; none found" >&2
+              exit 1
+            fi
+            certified="$(git rev-parse "${highest_tag}^{commit}")"
+            if [[ "$certified" != "$current" ]]; then
+              echo "GA $release_version must use the same commit as the highest QE tag ${highest_tag}" >&2
+              echo "Certified commit: $certified" >&2
+              echo "This commit:      $current" >&2
+              exit 1
+            fi
+            echo "GA matches highest QE tag ${highest_tag} at $certified"
           fi
-          release_version="${logical_version}-${build_number}"
+
           echo "version=$release_version" >> "$GITHUB_OUTPUT"
           echo "annotate-tag=$logical_version" >> "$GITHUB_OUTPUT"
           echo "maven-version=$release_version" >> "$GITHUB_OUTPUT"
-          echo "Release version: $release_version"
+          echo "Release version: $release_version ($kind)"
           echo "Annotation tag: $logical_version"
 
   build-sign-deploy:
