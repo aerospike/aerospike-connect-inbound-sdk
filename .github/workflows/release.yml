@@ -89,7 +89,6 @@ jobs:
     with:
       gh-workflows-ref: 7c8b65df2568974435ab8b40c9e9de6eae13b3bb
       gh-artifact-directory: dist
-      gh-retention-days: 5
       jf-project: connect
       jf-build-name: aerospike-connect-inbound-sdk
       oidc-provider-name: gh-aerospike
@@ -98,8 +97,6 @@ jobs:
       build-type: release
       jar-group-id: com.aerospike
       setup-java: true
-      java-version: "17"
-      java-distribution: temurin
       java-cache: gradle
       build-env: BUNDLE_VERSION=${{ needs.release-metadata.outputs.version }};MAVEN_VERSION=${{ needs.release-metadata.outputs.maven-version }};LOGICAL_VERSION=${{ needs.release-metadata.outputs.annotate-tag }};SNYK_TOKENS=unused
       build-script: |
@@ -140,8 +137,6 @@ jobs:
       jf-project: connect
       jf-build-names: ${{ needs.build-sign-deploy.outputs.jf-build-name }}:${{ needs.build-sign-deploy.outputs.jf-build-id }}
       jf-bundle-name: aerospike-connect-inbound-sdk
-      oidc-provider-name: gh-aerospike
-      oidc-audience: aerospike
       version: ${{ needs.release-metadata.outputs.version }}
 
   promote-to-dev:
