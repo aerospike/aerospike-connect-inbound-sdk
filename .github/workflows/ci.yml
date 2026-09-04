@@ -2,6 +2,10 @@ name: CI
 
 on:
   push:
+    # Limit to branches. An unfiltered push also fires on tag creation,
+    # which is already handled by the release workflow.
+    branches:
+      - "**"
   pull_request:
     branches:
       - master
