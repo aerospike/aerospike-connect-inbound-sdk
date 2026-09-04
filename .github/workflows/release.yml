@@ -113,6 +113,10 @@ jobs:
           generateMetadataFileForMavenJavaPublication
 
         mkdir -p dist
+        # The sources and javadoc jars have no sibling POM, so deploy-artifacts
+        # reads their coordinates from the Maven descriptor that the build
+        # embeds (see PublishingExtensions.embedMavenDescriptor). Without it
+        # they are stored outside the GAV of the main artifact.
         cp build/libs/*.jar dist/
         cp build/publications/mavenJava/pom-default.xml \
           "dist/aerospike-connect-inbound-sdk-${MAVEN_VERSION}.pom"

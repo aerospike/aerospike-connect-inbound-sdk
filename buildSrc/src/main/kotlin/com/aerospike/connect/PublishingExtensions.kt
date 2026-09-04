@@ -21,8 +21,10 @@ package com.aerospike.connect
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.register
 
 /**
  * Setup the Maven publication.
@@ -82,6 +84,53 @@ fun Project.setupPublishingTasks() {
                         url.set("https://www.aerospike.com/")
                     }
                 }
+            }
+        }
+    }
+
+    embedMavenDescriptor()
+}
+
+/**
+ * Adds `META-INF/maven/<groupId>/<artifactId>/pom.properties` to the main,
+ * sources, and javadoc jars, the way the Maven archiver does.
+ *
+ * The release pipeline derives the Maven coordinates of every jar it uploads.
+ * A `-sources` or `-javadoc` jar has no sibling POM to read, so without the
+ * embedded descriptor its group id is unknown and it is stored outside the
+ * coordinates of the main artifact instead of as a classifier of it.
+ */
+private fun Project.embedMavenDescriptor() {
+    val groupId = project.group.toString()
+    val artifactId = project.name
+
+    val pomProperties = tasks.register("mavenDescriptorProperties") {
+        val output = layout.buildDirectory
+            .file("maven-descriptor/pom.properties")
+        val versionProvider = provider { project.version.toString() }
+
+        outputs.file(output)
+        inputs.property("groupId", groupId)
+        inputs.property("artifactId", artifactId)
+        inputs.property("version", versionProvider)
+
+        doLast {
+            val file = output.get().asFile
+            file.parentFile.mkdirs()
+            file.writeText(
+                """
+                groupId=$groupId
+                artifactId=$artifactId
+                version=${versionProvider.get()}
+                """.trimIndent() + "\n"
+            )
+        }
+    }
+
+    listOf("jar", "sourcesJar", "javadocJar").forEach { name ->
+        tasks.named(name, Jar::class.java) {
+            from(pomProperties) {
+                into("META-INF/maven/$groupId/$artifactId")
             }
         }
     }
