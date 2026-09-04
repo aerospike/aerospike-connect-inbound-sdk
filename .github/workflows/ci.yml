@@ -1,0 +1,173 @@
+name: CI
+
+on:
+  push:
+    # Limit to branches. An unfiltered push also fires on tag creation,
+    # which is already handled by the release workflow.
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - master
+      - stage
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build SDK
+    runs-on: ubuntu-22.04
+    outputs:
+      run: ${{ steps.decide.outputs.run }}
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      - name: Skip push CI when a PR is open
+        id: decide
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" != "push" ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          count="$(gh pr list --repo "${{ github.repository }}" \
+            --head "${{ github.ref_name }}" --state open --json number --jq 'length')"
+          if [[ "$count" -gt 0 ]]; then
+            echo "Open PR exists for ${{ github.ref_name }}; skipping push CI"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out source
+        if: steps.decide.outputs.run == 'true'
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        if: steps.decide.outputs.run == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle
+        if: steps.decide.outputs.run == 'true'
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build SDK
+        if: steps.decide.outputs.run == 'true'
+        run: ./gradlew --no-daemon clean build
+
+      - name: Check dependency upgrades
+        if: steps.decide.outputs.run == 'true'
+        run: >-
+          ./gradlew --no-daemon dependencyUpdates
+          -Drevision=release
+          -DgradleReleaseChannel=current
+          -DoutputFormatter=html
+          --no-parallel
+          --warning-mode=all
+
+      - name: Upload build reports and artifacts
+        if: always() && steps.decide.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-artifacts
+          if-no-files-found: warn
+          retention-days: 5
+          path: |
+            **/build/test-results/**/*.xml
+            **/build/dependencyUpdates/*
+            **/build/libs/**/*.jar
+            **/build/distributions/*
+            **/build/reports/**/*
+
+  snyk:
+    name: Scan dependencies with Snyk
+    runs-on: ubuntu-22.04
+    env:
+      SNYK_TOKENS: ${{ secrets.SNYK_TOKEN }}
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      - name: Skip push CI when a PR is open
+        id: decide
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" != "push" ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          count="$(gh pr list --repo "${{ github.repository }}" \
+            --head "${{ github.ref_name }}" --state open --json number --jq 'length')"
+          if [[ "$count" -gt 0 ]]; then
+            echo "Open PR exists for ${{ github.ref_name }}; skipping push CI"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out source
+        if: steps.decide.outputs.run == 'true'
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        if: steps.decide.outputs.run == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle
+        if: steps.decide.outputs.run == 'true'
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Scan dependencies with Snyk
+        if: steps.decide.outputs.run == 'true' && env.SNYK_TOKENS != ''
+        run: ./gradlew --no-daemon snyk-test
+
+  examples:
+    name: Build examples
+    needs: build
+    if: needs.build.outputs.run == 'true'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Build JMS example
+        run: mvn -B -Dstyle.color=never -f examples/jms -U clean install
+
+      - name: Build Kafka example
+        run: mvn -B -Dstyle.color=never -f examples/kafka clean install
+
+      - name: Build Pulsar example
+        run: mvn -B -Dstyle.color=never -f examples/pulsar clean install

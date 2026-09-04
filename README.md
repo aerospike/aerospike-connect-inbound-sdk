@@ -44,3 +44,10 @@ dependencies {
     api "com.aerospike:aerospike-connect-inbound-sdk:1.4.4"
 }
 ```
+
+## Releasing
+
+Development lands on `stage`. Tag QE builds (`X.Y.Z-N`) from `stage`. After
+certification, merge `stage` into `master` with a merge commit and tag GA
+(`X.Y.Z`) at the same commit as the highest `-N`. See
+[docs/releasing.md](docs/releasing.md).

@@ -17,12 +17,8 @@
  */
 
 import com.aerospike.connect.configureDependencyUpdate
-import com.aerospike.connect.configureProperties
-import com.aerospike.connect.createGithubPublishTasks
 import com.aerospike.connect.setupJavaBuild
-import com.aerospike.connect.setupOssrhCredentialValidation
 import com.aerospike.connect.setupPublishingTasks
-import com.aerospike.connect.setupReleaseTasks
 import com.aerospike.connect.setupTests
 import com.aerospike.connect.setupVulnerabilityScanning
 
@@ -38,7 +34,6 @@ plugins {
     `lifecycle-base`
     jacoco
     `maven-publish`
-    signing
     java
 
     id("io.snyk.gradle.plugin.snykplugin")
@@ -58,7 +53,6 @@ allprojects {
         plugin("java-library")
         plugin("jacoco")
         plugin("maven-publish")
-        plugin("net.researchgate.release")
         plugin("io.snyk.gradle.plugin.snykplugin")
         plugin("com.github.ben-manes.versions")
     }
@@ -96,12 +90,8 @@ allprojects {
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     }
 
-    project.configureProperties()
     project.setupJavaBuild()
-    project.setupReleaseTasks()
     project.setupPublishingTasks()
-    project.createGithubPublishTasks()
-    project.setupOssrhCredentialValidation()
     project.setupVulnerabilityScanning()
     project.setupTests()
     project.configureDependencyUpdate()

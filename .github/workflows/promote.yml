@@ -1,0 +1,64 @@
+# Manually promote an inbound SDK release bundle from DEV through TEST then STAGE.
+#
+# USAGE:
+#   1. Run "Build SDK release to DEV" and confirm the bundle is in DEV
+#   2. Actions → "Promote SDK release bundle" → Run workflow
+#   3. Enter the exact bundle version (QE 1.4.5-1, or GA 1.4.5)
+#
+# TRIGGER: workflow_dispatch (manual only)
+#
+name: Promote SDK release bundle
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: JFrog release bundle version (QE 1.4.5-1, or GA 1.4.5)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: sdk-promote-${{ inputs.version }}
+  cancel-in-progress: false
+
+env:
+  BUNDLE_NAME: aerospike-connect-inbound-sdk
+
+jobs:
+  promote:
+    name: Promote bundle through TEST and STAGE
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      - name: Set up JFrog CLI
+        uses: step-security/setup-jfrog-cli@53aeacb709fce45d0baf69a13ec3342f7e2d71a9 # v5.1.0
+        env:
+          JF_URL: https://artifact.aerospike.io
+          JF_PROJECT: connect
+        with:
+          oidc-provider-name: gh-aerospike
+          oidc-audience: aerospike
+
+      - name: Promote to TEST
+        uses: aerospike/shared-workflows/.github/actions/promote-release-bundle@7c8b65df2568974435ab8b40c9e9de6eae13b3bb # main, includes shared-workflows#293
+        with:
+          bundle-name: ${{ env.BUNDLE_NAME }}
+          version: ${{ inputs.version }}
+          environment: TEST
+          jf-project: connect
+
+      - name: Promote to STAGE
+        uses: aerospike/shared-workflows/.github/actions/promote-release-bundle@7c8b65df2568974435ab8b40c9e9de6eae13b3bb # main, includes shared-workflows#293
+        with:
+          bundle-name: ${{ env.BUNDLE_NAME }}
+          version: ${{ inputs.version }}
+          environment: STAGE
+          jf-project: connect
