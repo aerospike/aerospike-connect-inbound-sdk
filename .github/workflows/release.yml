@@ -1,7 +1,7 @@
 # Builds, signs, and publishes the SDK to JFrog, then promotes the bundle to DEV.
 #
 # USAGE:
-#   Dev: run "Tag next -N and build to DEV" on any branch, or tag X.Y.Z-N yourself
+#   Dev: tag X.Y.Z-N from any branch to get a DEV bundle to try out
 #   QE:  squash stage, tag X.Y.Z-N from stage, then promote that bundle
 #   GA:  merge stage into master with a merge commit, then tag X.Y.Z at the same
 #        commit as the highest -N (the squash commit, not master HEAD). Push a

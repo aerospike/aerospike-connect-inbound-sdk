@@ -14,21 +14,14 @@ QE certifies `-N` bundles built from `stage`. The shippable release is plain
 | GA | `1.4.5` | same commit as highest `-N` (must be on `master`) | `1.4.5` |
 
 A `-N` tag may be pushed from any branch, so a dev can get a DEV bundle without
-touching `stage`. Prefer **Tag next -N and build to DEV**: it runs on the
-branch you select, takes the next unused N for `gradle.properties` (or an
-explicit unused `X.Y.Z-N` if you fill version), annotates the tag with optional
-notes, and starts the DEV build. Filling version avoids two concurrent auto-runs
-picking the same N or skipping one you already reserved. A tag that already
-exists is a hard error; it does not bump.
-
-**Promote SDK release bundle** is the gate: it requires the tag named after the
-bundle version to be on `stage`, so a bundle built off a dev branch cannot go
-past DEV.
+touching `stage`. Pick an unused N yourself (`git tag 1.4.5-3 && git push
+origin 1.4.5-3`). **Promote SDK release bundle** is the gate: it requires the
+tag named after the bundle version to be on `stage`, so a bundle built off a
+dev branch cannot go past DEV.
 
 **Before the `-N` tag you hand to QE**, squash `stage` onto `master` into a
-single commit (see the `sdk-release` skill). Then run **Tag next -N and build
-to DEV** on `stage` (or tag `X.Y.Z-N` yourself and run **Build SDK release to
-DEV**).
+single commit (see the `sdk-release` skill). Then tag `X.Y.Z-N` on that commit
+and run **Build SDK release to DEV**.
 
 **After QE certifies**, open a PR `stage` → `master` and use **Create a merge
 commit** (not squash, not rebase). That keeps the squash commit as a parent of
