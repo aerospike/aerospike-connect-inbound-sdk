@@ -18,7 +18,6 @@
 
 plugins {
     `kotlin-dsl`
-    groovy
     `java-gradle-plugin`
 }
 
@@ -29,12 +28,6 @@ repositories {
 }
 
 dependencies {
-    api("net.researchgate:gradle-release:3.1.0")
     api("io.snyk.gradle.plugin.snykplugin:io.snyk.gradle.plugin.snykplugin.gradle.plugin:0.7.0")
-    api("com.github.breadmoirai:github-release:2.5.2")
     api("com.github.ben-manes:gradle-versions-plugin:+")
-
-    val jacksonVersion = "2.22.1"
-    api("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
-    api("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
 }

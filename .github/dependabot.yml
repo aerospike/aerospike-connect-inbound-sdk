@@ -2,5 +2,11 @@ version: 2
 updates:
   - package-ecosystem: gradle
     directory: /
+    target-branch: stage
     schedule:
       interval: daily
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: stage
+    schedule:
+      interval: weekly
