@@ -24,9 +24,7 @@ on:
   push:
     tags:
       - "[0-9]+.[0-9]+.[0-9]+-[0-9]+"
-      - "v[0-9]+.[0-9]+.[0-9]+-[0-9]+"
       - "[0-9]+.[0-9]+.[0-9]+"
-      - "v[0-9]+.[0-9]+.[0-9]+"
   workflow_dispatch:
     inputs:
       version:
@@ -74,7 +72,6 @@ jobs:
         run: |
           set -euo pipefail
           version="${DISPATCH_VERSION:-${GITHUB_REF_NAME}}"
-          version="${version#v}"
           if [[ "$version" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-([0-9]+)$ ]]; then
             kind=qe
             logical_version="${BASH_REMATCH[1]}"
@@ -112,15 +109,14 @@ jobs:
             while IFS= read -r tag; do
               [[ -z "$tag" ]] && continue
               t="${tag#refs/tags/}"
-              t="${t#v}"
               if [[ "$t" =~ ^${logical_re}-([0-9]+)$ ]]; then
                 n=$((10#${BASH_REMATCH[1]}))
                 if (( n > highest )); then
                   highest=$n
-                  highest_tag="${tag#refs/tags/}"
+                  highest_tag="$t"
                 fi
               fi
-            done < <(git tag -l "${logical_version}-*" "v${logical_version}-*")
+            done < <(git tag -l "${logical_version}-*")
             if [[ -z "$highest_tag" ]]; then
               echo "GA $release_version requires a QE tag ${logical_version}-N; none found" >&2
               exit 1
