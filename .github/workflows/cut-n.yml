@@ -1,0 +1,124 @@
+# Tags the selected branch with the next unused X.Y.Z-N and starts a DEV build.
+#
+# USAGE:
+#   Actions → "Tag next -N and build to DEV" → Run workflow
+#   Pick any branch. Leave version empty to take max(existing N)+1 for the
+#   logical version in gradle.properties. Or enter an unused X.Y.Z-N so a
+#   concurrent auto-run cannot steal a number you already chose.
+#
+# A tag pushed with GITHUB_TOKEN does not start other workflows, so this job
+# dispatches "Build SDK release to DEV" after the tag is on origin.
+#
+name: Tag next -N and build to DEV
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Unused X.Y.Z-N (empty = next N for gradle.properties)
+        required: false
+        type: string
+      notes:
+        description: Annotated-tag message (empty = branch, SHA, and version)
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  actions: write
+
+# One cut at a time so two runs cannot pick the same N.
+concurrency:
+  group: sdk-cut-n
+  cancel-in-progress: false
+
+jobs:
+  cut:
+    name: Create -N tag
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Resolve, tag, and start DEV build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_VERSION: ${{ inputs.version }}
+          NOTES: ${{ inputs.notes }}
+        run: |
+          set -euo pipefail
+          git fetch origin --tags --force
+          logical_version=$(grep '^version=' gradle.properties | cut -d= -f2)
+          if [[ ! "$logical_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "gradle.properties version must be X.Y.Z, got: $logical_version" >&2
+            exit 1
+          fi
+          logical_re="${logical_version//./\\.}"
+
+          requested="${REQUESTED_VERSION:-}"
+          requested="${requested#"${requested%%[![:space:]]*}"}"
+          requested="${requested%"${requested##*[![:space:]]}"}"
+
+          if [[ -n "$requested" ]]; then
+            if [[ ! "$requested" =~ ^([0-9]+\.[0-9]+\.[0-9]+)-([0-9]+)$ ]]; then
+              echo "version must be empty or X.Y.Z-N, got: $requested" >&2
+              exit 1
+            fi
+            req_logical="${BASH_REMATCH[1]}"
+            req_n=$((10#${BASH_REMATCH[2]}))
+            if [[ "$req_logical" != "$logical_version" ]]; then
+              echo "Requested $requested does not match gradle.properties $logical_version" >&2
+              exit 1
+            fi
+            if (( req_n < 1 )); then
+              echo "Build number N must be at least 1 in $requested" >&2
+              exit 1
+            fi
+            tag="$requested"
+            if git rev-parse -q --verify "refs/tags/${tag}" >/dev/null; then
+              echo "Tag $tag already exists. Pick a free N or leave version empty." >&2
+              exit 1
+            fi
+          else
+            highest=0
+            while IFS= read -r existing; do
+              [[ -z "$existing" ]] && continue
+              t="${existing#refs/tags/}"
+              if [[ "$t" =~ ^${logical_re}-([0-9]+)$ ]]; then
+                n=$((10#${BASH_REMATCH[1]}))
+                if (( n > highest )); then
+                  highest=$n
+                fi
+              fi
+            done < <(git tag -l "${logical_version}-*")
+            tag="${logical_version}-$((highest + 1))"
+            echo "Next unused tag after ${logical_version}-${highest} is $tag"
+          fi
+
+          message="${NOTES:-}"
+          message="${message#"${message%%[![:space:]]*}"}"
+          message="${message%"${message##*[![:space:]]}"}"
+          if [[ -z "$message" ]]; then
+            message="DEV bundle ${tag} from ${GITHUB_REF_NAME} (${GITHUB_SHA})"
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$tag" -m "$message"
+          git push origin "refs/tags/${tag}"
+          echo "Created tag $tag at $GITHUB_SHA"
+
+          gh workflow run ".github/workflows/release.yml" \
+            --ref "$tag" \
+            -f "version=$tag"
+          echo "Dispatched Build SDK release to DEV for $tag"
+          echo "tag=$tag" >> "$GITHUB_STEP_SUMMARY"
+          echo "commit=$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"

@@ -5,6 +5,11 @@
 #   2. Actions → "Promote SDK release bundle" → Run workflow
 #   3. Enter the exact bundle version (QE 1.4.5-1, or GA 1.4.5)
 #
+# A -N bundle may be built from any branch, so it can hold a dev commit. This
+# workflow is the gate: the tag named after the bundle version must point at a
+# commit on stage (QE) or master (GA). Bundles built off a dev branch stay in
+# DEV.
+#
 # TRIGGER: workflow_dispatch (manual only)
 #
 name: Promote SDK release bundle
@@ -37,6 +42,42 @@ jobs:
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
           egress-policy: audit
+
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Verify the bundle was built from stage or master
+        shell: bash
+        env:
+          BUNDLE_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          if [[ "$BUNDLE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$ ]]; then
+            required_branch=stage
+          elif [[ "$BUNDLE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            required_branch=master
+          else
+            echo "Invalid bundle version: $BUNDLE_VERSION" >&2
+            echo "Use X.Y.Z-N for QE (for example, 1.4.5-1) or X.Y.Z for GA (for example, 1.4.5)." >&2
+            exit 1
+          fi
+
+          git fetch origin "$required_branch" --tags
+          if ! git rev-parse -q --verify "refs/tags/${BUNDLE_VERSION}^{commit}" >/dev/null; then
+            echo "No tag $BUNDLE_VERSION in this repository" >&2
+            echo "Promotion requires a tag named exactly after the bundle version." >&2
+            exit 1
+          fi
+          commit="$(git rev-parse "refs/tags/${BUNDLE_VERSION}^{commit}")"
+          if ! git merge-base --is-ancestor "$commit" "origin/${required_branch}"; then
+            echo "Tag $BUNDLE_VERSION ($commit) is not on $required_branch" >&2
+            echo "Only bundles built from $required_branch can be promoted past DEV." >&2
+            exit 1
+          fi
+          echo "Tag $BUNDLE_VERSION is on $required_branch at $commit"
 
       - name: Set up JFrog CLI
         uses: step-security/setup-jfrog-cli@53aeacb709fce45d0baf69a13ec3342f7e2d71a9 # v5.1.0

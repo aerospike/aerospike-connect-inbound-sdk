@@ -54,6 +54,7 @@ Do not use `git rebase -i`. Do not amend. Do not force-push `master`.
 
 ## After squash (only if asked)
 
-- Tag QE: `git tag <X.Y.Z-N> && git push origin <X.Y.Z-N>` from this commit.
+- Tag QE: run **Tag next -N and build to DEV** on `stage`, or
+  `git tag <X.Y.Z-N> && git push origin <X.Y.Z-N>`.
 - GA: after the merge-commit PR, `git tag <X.Y.Z> <highest-N-tag>` and push.
   Never tag GA at the merge commit (`master` HEAD).

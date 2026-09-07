@@ -47,7 +47,8 @@ dependencies {
 
 ## Releasing
 
-Development lands on `stage`. Tag QE builds (`X.Y.Z-N`) from `stage`. After
-certification, merge `stage` into `master` with a merge commit and tag GA
-(`X.Y.Z`) at the same commit as the highest `-N`. See
+Development lands on `stage`. From any branch, run **Tag next -N and build to
+DEV** for a try-out bundle. For QE, squash `stage` first, then cut `-N` from
+`stage`. After certification, merge `stage` into `master` with a merge commit
+and tag GA (`X.Y.Z`) at the same commit as the highest `-N` on `stage`. See
 [docs/releasing.md](docs/releasing.md).
