@@ -4,11 +4,12 @@
 #   1. Run "Build SDK release to DEV" and confirm the bundle is in DEV
 #   2. Actions → "Promote SDK release bundle" → Run workflow
 #   3. Enter the exact bundle version (QE 1.4.5-1, or GA 1.4.5)
+#   4. Check TEST and/or STAGE. STAGE promotes TEST first unless the
+#      bundle is already on TEST.
 #
 # A -N bundle may be built from any branch, so it can hold a dev commit. This
 # workflow is the gate: the tag named after the bundle version must point at a
-# commit on stage (QE) or master (GA). Bundles built off a dev branch stay in
-# DEV.
+# commit on master. Bundles built off a dev branch stay in DEV.
 #
 # TRIGGER: workflow_dispatch (manual only)
 #
@@ -21,6 +22,16 @@ on:
         description: JFrog release bundle version (QE 1.4.5-1, or GA 1.4.5)
         required: true
         type: string
+      test:
+        description: Promote to TEST
+        required: true
+        type: boolean
+        default: false
+      stage:
+        description: Promote to STAGE (includes TEST if not already there)
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -35,7 +46,7 @@ env:
 
 jobs:
   promote:
-    name: Promote bundle through TEST and STAGE
+    name: Promote bundle
     runs-on: ubuntu-22.04
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -49,35 +60,31 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Verify the bundle was built from stage or master
+      - name: Verify the bundle was built from master
         shell: bash
         env:
           BUNDLE_VERSION: ${{ inputs.version }}
         run: |
           set -euo pipefail
-          if [[ "$BUNDLE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$ ]]; then
-            required_branch=stage
-          elif [[ "$BUNDLE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            required_branch=master
-          else
+          if [[ ! "$BUNDLE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+)?$ ]]; then
             echo "Invalid bundle version: $BUNDLE_VERSION" >&2
             echo "Use X.Y.Z-N for QE (for example, 1.4.5-1) or X.Y.Z for GA (for example, 1.4.5)." >&2
             exit 1
           fi
 
-          git fetch origin "$required_branch" --tags
+          git fetch origin master --tags
           if ! git rev-parse -q --verify "refs/tags/${BUNDLE_VERSION}^{commit}" >/dev/null; then
             echo "No tag $BUNDLE_VERSION in this repository" >&2
             echo "Promotion requires a tag named exactly after the bundle version." >&2
             exit 1
           fi
           commit="$(git rev-parse "refs/tags/${BUNDLE_VERSION}^{commit}")"
-          if ! git merge-base --is-ancestor "$commit" "origin/${required_branch}"; then
-            echo "Tag $BUNDLE_VERSION ($commit) is not on $required_branch" >&2
-            echo "Only bundles built from $required_branch can be promoted past DEV." >&2
+          if ! git merge-base --is-ancestor "$commit" origin/master; then
+            echo "Tag $BUNDLE_VERSION ($commit) is not on master" >&2
+            echo "Only bundles built from master can be promoted past DEV." >&2
             exit 1
           fi
-          echo "Tag $BUNDLE_VERSION is on $required_branch at $commit"
+          echo "Tag $BUNDLE_VERSION is on master at $commit"
 
       - name: Set up JFrog CLI
         uses: step-security/setup-jfrog-cli@53aeacb709fce45d0baf69a13ec3342f7e2d71a9 # v5.1.0
@@ -88,7 +95,72 @@ jobs:
           oidc-provider-name: gh-aerospike
           oidc-audience: aerospike
 
+      - name: Resolve destination environments
+        id: resolve
+        env:
+          BUNDLE_VERSION: ${{ inputs.version }}
+          WANT_TEST: ${{ inputs.test }}
+          WANT_STAGE: ${{ inputs.stage }}
+        run: |
+          set -euo pipefail
+          want_test=false
+          want_stage=false
+          if [[ "${WANT_TEST}" == "true" ]]; then
+            want_test=true
+          fi
+          if [[ "${WANT_STAGE}" == "true" ]]; then
+            want_stage=true
+          fi
+          if [[ "$want_test" != true && "$want_stage" != true ]]; then
+            echo "Select TEST and/or STAGE" >&2
+            exit 1
+          fi
+
+          completed=""
+          records_path="/lifecycle/api/v2/promotion/records/${{ env.BUNDLE_NAME }}/${BUNDLE_VERSION}?project=connect"
+          if records="$(jf curl -sS -XGET "$records_path" 2>/dev/null)"; then
+            completed="$(printf '%s' "$records" | jq -r '
+              [.promotions[]? | select(.status == "COMPLETED") | .environment] | unique | .[]
+            ' 2>/dev/null || true)"
+            echo "Completed promotions:"
+            printf '%s\n' "${completed:-"(none found)"}"
+          else
+            echo "Could not list promotions; will promote TEST if STAGE is selected"
+          fi
+
+          on_env() {
+            printf '%s\n' "$completed" | grep -qx "$1"
+          }
+
+          promote_test=false
+          promote_stage=false
+          if [[ "$want_test" == true ]]; then
+            if on_env TEST; then
+              echo "Already on TEST; skipping TEST"
+            else
+              promote_test=true
+            fi
+          fi
+          if [[ "$want_stage" == true ]]; then
+            if on_env STAGE; then
+              echo "Already on STAGE; skipping STAGE"
+            else
+              promote_stage=true
+              if ! on_env TEST && [[ "$promote_test" != true ]]; then
+                echo "STAGE selected and not on TEST; including TEST"
+                promote_test=true
+              fi
+            fi
+          fi
+
+          if [[ "$promote_test" != true && "$promote_stage" != true ]]; then
+            echo "Nothing to promote; already at the selected environment(s)"
+          fi
+          echo "promote-test=$promote_test" >> "$GITHUB_OUTPUT"
+          echo "promote-stage=$promote_stage" >> "$GITHUB_OUTPUT"
+
       - name: Promote to TEST
+        if: steps.resolve.outputs.promote-test == 'true'
         uses: aerospike/shared-workflows/.github/actions/promote-release-bundle@7c8b65df2568974435ab8b40c9e9de6eae13b3bb # main, includes shared-workflows#293
         with:
           bundle-name: ${{ env.BUNDLE_NAME }}
@@ -97,6 +169,7 @@ jobs:
           jf-project: connect
 
       - name: Promote to STAGE
+        if: steps.resolve.outputs.promote-stage == 'true'
         uses: aerospike/shared-workflows/.github/actions/promote-release-bundle@7c8b65df2568974435ab8b40c9e9de6eae13b3bb # main, includes shared-workflows#293
         with:
           bundle-name: ${{ env.BUNDLE_NAME }}
