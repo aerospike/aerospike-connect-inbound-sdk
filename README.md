@@ -47,8 +47,8 @@ dependencies {
 
 ## Releasing
 
-Development lands on `stage`. Tag `X.Y.Z-N` from any branch for a DEV try-out.
-For QE, squash `stage` first, then tag `-N` from `stage`. After certification,
-merge `stage` into `master` with a merge commit and tag GA (`X.Y.Z`) at the
-same commit as the highest `-N` on `stage`. See
+Development lands on `master` via squash-merge. Tag `X.Y.Z-N` from any branch
+for a DEV try-out. For QE, tag `-N` from `master` and promote. If QE rejects,
+fix forward on `master` and tag a new N. After certification, tag GA
+(`X.Y.Z`) at the same commit as that `-N`. See
 [docs/releasing.md](docs/releasing.md).

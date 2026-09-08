@@ -2,25 +2,24 @@
 #
 # USAGE:
 #   Dev: tag X.Y.Z-N from any branch to get a DEV bundle to try out
-#   QE:  squash stage, tag X.Y.Z-N from stage, then promote that bundle
-#   GA:  merge stage into master with a merge commit, then tag X.Y.Z at the same
-#        commit as the highest -N (the squash commit, not master HEAD). Push a
+#   QE:  squash-merge to master, tag X.Y.Z-N on that commit, then promote
+#   GA:  tag X.Y.Z at the same commit as the highest -N on master. Push a
 #        tag, or run this workflow and enter the version.
+#   If QE rejects, fix forward on master and tag a new N. Do not rewrite master.
 #   Then consume DEV and promote TEST then STAGE with "Promote SDK release bundle".
 #
 # A -N bundle can be built from any branch, because it only reaches DEV and the
 # next attempt just takes a new N. "Promote SDK release bundle" requires the tag
-# to be on stage before TEST/STAGE. A GA version can never be rebuilt, so this
-# workflow checks it against master and the highest -N up front.
+# to be on master before TEST/STAGE. A GA version can never be rebuilt, so this
+# workflow checks it against master and the highest -N on master up front.
 #
 # Bundles are immutable. Bundle, tag, and Maven GAV share the same version, and
 # both kinds are annotated with the logical version from gradle.properties.
 #
 # VERSION EXAMPLES (gradle.properties version=1.4.5):
-#   1.4.5-1 -> bundle/tag/Maven 1.4.5-1, promotable from stage; annotate 1.4.5
+#   1.4.5-1 -> bundle/tag/Maven 1.4.5-1, promotable from master; annotate 1.4.5
 #   1.4.5-2 -> next attempt at a new commit; annotate 1.4.5
-#   1.4.5   -> GA at the same commit as the highest -N (reachable from master);
-#              annotate 1.4.5
+#   1.4.5   -> GA at the same commit as the highest -N on master; annotate 1.4.5
 #
 name: Build SDK release to DEV
 
@@ -98,10 +97,10 @@ jobs:
           current="$GITHUB_SHA"
           # A -N bundle can be built from any branch: it only reaches DEV, and
           # the next attempt just takes a new N. Promotion to TEST/STAGE is
-          # where the commit has to be on stage. A GA version can never be
+          # where the commit has to be on master. A GA version can never be
           # rebuilt, so it is checked here, before the bundle name is spent.
           if [[ "$kind" == ga ]]; then
-            git fetch origin master stage --tags
+            git fetch origin master --tags
             if ! git merge-base --is-ancestor "$current" origin/master; then
               echo "GA version $release_version must be tagged from a commit on master" >&2
               exit 1
@@ -116,10 +115,10 @@ jobs:
                 continue
               fi
               n=$((10#${BASH_REMATCH[1]}))
-              # Only tags on stage were promotable, so only those were certified.
+              # Only tags on master were promotable, so only those were certified.
               # This skips -N tags a dev pushed from a branch for a DEV bundle.
-              if ! git merge-base --is-ancestor "${t}^{commit}" origin/stage; then
-                echo "Ignoring $t: not on stage"
+              if ! git merge-base --is-ancestor "${t}^{commit}" origin/master; then
+                echo "Ignoring $t: not on master"
                 continue
               fi
               if (( n > highest )); then
@@ -128,7 +127,7 @@ jobs:
               fi
             done < <(git tag -l "${logical_version}-*")
             if [[ -z "$highest_tag" ]]; then
-              echo "GA $release_version requires a QE tag ${logical_version}-N on stage; none found" >&2
+              echo "GA $release_version requires a QE tag ${logical_version}-N on master; none found" >&2
               exit 1
             fi
             certified="$(git rev-parse "${highest_tag}^{commit}")"
