@@ -64,7 +64,7 @@ jobs:
 
       - name: Set up Gradle
         if: steps.decide.outputs.run == 'true'
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Build SDK
         if: steps.decide.outputs.run == 'true'
@@ -137,7 +137,7 @@ jobs:
 
       - name: Set up Gradle
         if: steps.decide.outputs.run == 'true'
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Scan dependencies with Snyk
         if: steps.decide.outputs.run == 'true' && env.SNYK_TOKENS != ''
