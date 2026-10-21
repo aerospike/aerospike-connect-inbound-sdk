@@ -161,7 +161,7 @@ jobs:
 
       - name: Promote to TEST
         if: steps.resolve.outputs.promote-test == 'true'
-        uses: aerospike/shared-workflows/.github/actions/promote-release-bundle@67ca86b3f0fa3a8e2b7530f173d6c1fd8ea9e94d # main, includes shared-workflows#293
+        uses: aerospike/shared-workflows/.github/actions/promote-release-bundle@f7d1ce30b376733a51ea05b99f20646d0e248afc # main, includes shared-workflows#293
         with:
           bundle-name: ${{ env.BUNDLE_NAME }}
           version: ${{ inputs.version }}
@@ -170,7 +170,7 @@ jobs:
 
       - name: Promote to STAGE
         if: steps.resolve.outputs.promote-stage == 'true'
-        uses: aerospike/shared-workflows/.github/actions/promote-release-bundle@67ca86b3f0fa3a8e2b7530f173d6c1fd8ea9e94d # main, includes shared-workflows#293
+        uses: aerospike/shared-workflows/.github/actions/promote-release-bundle@f7d1ce30b376733a51ea05b99f20646d0e248afc # main, includes shared-workflows#293
         with:
           bundle-name: ${{ env.BUNDLE_NAME }}
           version: ${{ inputs.version }}
