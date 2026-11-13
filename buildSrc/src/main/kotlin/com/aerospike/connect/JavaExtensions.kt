@@ -25,14 +25,12 @@ import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.external.javadoc.StandardJavadocDocletOptions
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getByName
-import org.gradle.kotlin.dsl.getValue
-import org.gradle.kotlin.dsl.provideDelegate
 
 /**
  * Setup Java tasks and compiler arguments.
  */
 fun Project.setupJavaBuild() {
-    val compileJava: JavaCompile by tasks
+    val compileJava = tasks.getByName("compileJava", JavaCompile::class)
     compileJava.sourceCompatibility = "11"
     compileJava.targetCompatibility = "11"
     compileJava.options.apply {
